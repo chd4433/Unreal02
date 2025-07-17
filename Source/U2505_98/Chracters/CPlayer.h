@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Weapons/ISword.h"
+#include "Weapons/IShield.h"
 #include "GenericTeamAgentInterface.h"
 #include "Weapons/IDamagable.h"
 #include "CPlayer.generated.h"
@@ -13,6 +14,7 @@ class U2505_98_API ACPlayer
 	, public IISword
 	, public IGenericTeamAgentInterface
 	, public IIDamagable
+	, public IIShield
 {
 	GENERATED_BODY()
 
@@ -33,6 +35,10 @@ private:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<class ACSword> SwordClass;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	TSubclassOf<class ACShield> ShieldClass;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Widget")
@@ -110,8 +116,15 @@ public:
 	void Begin_Collision() override;
 	void End_Collision() override;
 
+public:
+	void Begin_shielded() override;
+	void End_shielded() override;
+
 private:
 	class ACSword* Sword;
+
+private:
+	class ACShield* Shield;
 
 private:
 	class UCUserWidget_Player* UI_Player;

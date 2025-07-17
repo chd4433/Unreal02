@@ -13,4 +13,7 @@ class U2505_98_API UCUserWidget_Player : public UUserWidget
 public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateEquipped(bool bEquipped);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateHealth(float InHealth, float InMaxHealth);
 };

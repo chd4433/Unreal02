@@ -10,6 +10,7 @@
 
 #include "CAnimInstance.h"
 #include "Weapons/CSword.h"
+#include "Weapons/CShield.h"
 #include "Widgets/CUserWidget_Player.h"
 
 ACPlayer::ACPlayer()
@@ -39,6 +40,8 @@ ACPlayer::ACPlayer()
 	SpringArm->bEnableCameraLag = true;
 
 	FHelpers::GetClass<ACSword>(&SwordClass, "/Script/Engine.Blueprint'/Game/Weapons/BP_CSword.BP_CSword_C'");
+	
+	FHelpers::GetClass<ACShield>(&ShieldClass, "/Script/Engine.Blueprint'/Game/Weapons/BP_CShield.BP_CShield_C'");
 
 	UStaticMesh* sworldsheath;
 	FHelpers::GetAsset<UStaticMesh>(&sworldsheath, "/Script/Engine.StaticMesh'/Game/MercenaryWarrior/Meshes/SM_greatswordsheath.SM_greatswordsheath'");
@@ -60,6 +63,8 @@ void ACPlayer::BeginPlay()
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	Sword = GetWorld()->SpawnActor<ACSword>(SwordClass, transform, params);
+
+	Shield = GetWorld()->SpawnActor<ACShield>(ShieldClass, transform, params);
 
 	Health = MaxHealth;
 	bCanMove = true;
@@ -142,7 +147,7 @@ float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 
 	Health -= damage;
 	Health = FMath::Clamp<float>(Health, 0, MaxHealth);
-	//UI_Player->UpdateHealth(Health, MaxHealth);
+	UI_Player->UpdateHealth(Health, MaxHealth);
 
 	if (Health <= 0.0f)
 	{
@@ -161,19 +166,6 @@ float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 
 void ACPlayer::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 {
-	//ChangeColor(FLinearColor::Red);
-
-
-	/*FTimerDelegate timerDelegate;
-	timerDelegate.BindLambda([&]()
-		{
-			ChangeColor(OriginColor);
-		});
-
-	FTimerHandle handle;
-	GetWorld()->GetTimerManager().SetTimer(handle, timerDelegate, 0.2f, false);*/
-
-
 	CheckNull(InEvent);
 
 	FDamagedData* data = InEvent->DamagedData;
@@ -181,20 +173,9 @@ void ACPlayer::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 	data->PlayHitMotion(this);
 
 
-	/*FVector start = GetActorLocation();
-	FVector target = InAttacker->GetActorLocation();
-	FVector direction = target - start;
-	direction.Normalize();
-
-	if (data->Launch > 0.0f)
-		LaunchCharacter(-direction * data->Launch, false, false);*/
-
-	//SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
-
 
 	if (InEvent->bFirstHit)
 	{
-		//data->PlayCameraShake(GetWorld());
 		data->PlayHitStop(this, InAttacker);
 	}
 
@@ -292,7 +273,7 @@ void ACPlayer::Begin_DoAction()
 void ACPlayer::End_DoAction()
 {
 	CheckNull(Sword);
-
+	bCanMove = true;
 	Sword->End_DoAction();
 }
 
