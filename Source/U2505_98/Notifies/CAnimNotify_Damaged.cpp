@@ -1,6 +1,7 @@
 #include "Notifies/CAnimNotify_Damaged.h"
 #include "Global.h"
 #include "Chracters/CEnemy.h"
+#include "Chracters/CPlayer.h"
 
 UCAnimNotify_Damaged::UCAnimNotify_Damaged()
 {
@@ -21,7 +22,16 @@ void UCAnimNotify_Damaged::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenc
 	CheckNull(MeshComp->GetOwner());
 
 	ACEnemy* enemy = Cast<ACEnemy>(MeshComp->GetOwner());
-	CheckNull(enemy);
+	if (!!enemy)
+	{
+		enemy->End_Damaged();
+		return;
+	}
 
-	enemy->End_Damaged();
+	ACPlayer* player = Cast<ACPlayer>(MeshComp->GetOwner());
+	if (!!player)
+	{
+		player->End_Damaged();
+		return;
+	}
 }

@@ -46,6 +46,8 @@ ACPlayer::ACPlayer()
 	Sworldsheath->SetCollisionProfileName("NoCollision");
 
 	FHelpers::GetClass<UCUserWidget_Player>(&UI_PlayerClass, "/Script/UMGEditor.WidgetBlueprint'/Game/Widgets/WB_Player.WB_Player_C'");
+
+	FHelpers::GetAsset<UAnimMontage>(&DeadMontage, "/Script/Engine.AnimMontage'/Game/Montages/Deaths_Hit_Dazed_Montage.Deaths_Hit_Dazed_Montage'");
 }
 
 void ACPlayer::BeginPlay()
@@ -58,6 +60,9 @@ void ACPlayer::BeginPlay()
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	Sword = GetWorld()->SpawnActor<ACSword>(SwordClass, transform, params);
+
+	Health = MaxHealth;
+	bCanMove = true;
 
 	UI_Player = CreateWidget<UCUserWidget_Player>(GetController<APlayerController>(), UI_PlayerClass);
 	UI_Player->AddToViewport();
@@ -94,6 +99,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ACPlayer::OnMoveForward(float InValue)
 {
+	CheckFalse(bCanMove);
 	FRotator rotator = FRotator(0, GetControlRotation().Yaw, 0);
 	FVector direction = FQuat(rotator).GetForwardVector();
 
@@ -102,6 +108,7 @@ void ACPlayer::OnMoveForward(float InValue)
 
 void ACPlayer::OnMoveRight(float InValue)
 {
+	CheckFalse(bCanMove);
 	FRotator rotator = FRotator(0, GetControlRotation().Yaw, 0);
 	FVector direction = FQuat(rotator).GetRightVector();
 
@@ -120,12 +127,104 @@ void ACPlayer::OnVerticalLook(float InValue)
 
 void ACPlayer::OnRun()
 {
+	CheckFalse(bCanMove);
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 }
 
 void ACPlayer::OffRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+}
+
+float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	Health -= damage;
+	Health = FMath::Clamp<float>(Health, 0, MaxHealth);
+	//UI_Player->UpdateHealth(Health, MaxHealth);
+
+	if (Health <= 0.0f)
+	{
+		Dead();
+
+		return 0.0f;
+	}
+
+
+	ACharacter* attacker = Cast<ACharacter>(EventInstigator->GetPawn());
+
+	Damaged((FDamagedDataEvent*)&DamageEvent, attacker);
+
+	return damage;
+}
+
+void ACPlayer::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
+{
+	//ChangeColor(FLinearColor::Red);
+
+
+	/*FTimerDelegate timerDelegate;
+	timerDelegate.BindLambda([&]()
+		{
+			ChangeColor(OriginColor);
+		});
+
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, timerDelegate, 0.2f, false);*/
+
+
+	CheckNull(InEvent);
+
+	FDamagedData* data = InEvent->DamagedData;
+
+	data->PlayHitMotion(this);
+
+
+	/*FVector start = GetActorLocation();
+	FVector target = InAttacker->GetActorLocation();
+	FVector direction = target - start;
+	direction.Normalize();
+
+	if (data->Launch > 0.0f)
+		LaunchCharacter(-direction * data->Launch, false, false);*/
+
+	//SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
+
+
+	if (InEvent->bFirstHit)
+	{
+		//data->PlayCameraShake(GetWorld());
+		data->PlayHitStop(this, InAttacker);
+	}
+
+	FVector point;
+	if (InEvent->Collision->GetClosestPointOnCollision(GetActorLocation(), point) > 0.0f)
+	{
+		data->PlayEffect(this, point);
+	}
+
+	bCanMove = false;
+}
+
+void ACPlayer::End_Damaged()
+{
+	bCanMove = true;
+}
+
+void ACPlayer::Dead()
+{
+	PlayAnimMontage(DeadMontage, DeadMontage_PlayRate);
+
+	if (!!UI_Player)
+		//UI_Player->Destr;
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ACPlayer::End_Dead()
+{
+	Destroy();
 }
 
 void ACPlayer::OnSword()

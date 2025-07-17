@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "Weapons/ISword.h"
 #include "GenericTeamAgentInterface.h"
+#include "Weapons/IDamagable.h"
 #include "CPlayer.generated.h"
 
 UCLASS()
@@ -11,6 +12,7 @@ class U2505_98_API ACPlayer
 	: public ACharacter
 	, public IISword
 	, public IGenericTeamAgentInterface
+	, public IIDamagable
 {
 	GENERATED_BODY()
 
@@ -36,6 +38,17 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Widget")
 	TSubclassOf<class UCUserWidget_Player> UI_PlayerClass;
 
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	class UAnimMontage* DeadMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	float DeadMontage_PlayRate = 1.0f;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Health")
+	float MaxHealth = 100;
+
 public:
 	ACPlayer();
 
@@ -57,6 +70,23 @@ private:
 private:
 	void OnRun();
 	void OffRun();
+
+public:
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+protected:
+	void Damaged(struct FDamagedDataEvent* InEvent, class ACharacter* InAttacker);
+
+public:
+	void End_Damaged();
+
+private:
+	void Dead();
+
+public:
+	void End_Dead();
+
+
 
 private:
 	void OnSword() override;
@@ -85,4 +115,8 @@ private:
 
 private:
 	class UCUserWidget_Player* UI_Player;
+
+private:
+	float Health;
+	bool bCanMove;
 };
