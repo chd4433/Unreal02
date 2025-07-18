@@ -28,11 +28,24 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
 	bool bEquip_Sword;
 
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
+	bool bDo_Shield;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
+	float ShieldAnimationBlendWeight;
+
+public:
+	FORCEINLINE bool CompleteShieldAnimation() { return ShieldAnimationBlendWeight >= 1.0f; }
+
 public:
 	void NativeBeginPlay() override;
 	void NativeUpdateAnimation(float DeltaSeconds) override;
 
 private:
 	class ACharacter* OwnerCharacter;
+
+private:
+	float BlendSpeed = 1.0f / 0.1f;
 	
 };

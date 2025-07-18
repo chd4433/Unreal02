@@ -117,6 +117,7 @@ public:
 	void End_Collision() override;
 
 public:
+	bool Do_shield() override;
 	void Begin_shielded() override;
 	void End_shielded() override;
 

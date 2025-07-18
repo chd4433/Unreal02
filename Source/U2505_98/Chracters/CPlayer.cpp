@@ -100,6 +100,9 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("Sword", EInputEvent::IE_Pressed, this, &ACPlayer::OnSword);
 	PlayerInputComponent->BindAction("Action", EInputEvent::IE_Pressed, this, &ACPlayer::OnDoAction);
+
+	PlayerInputComponent->BindAction("Shield", EInputEvent::IE_Pressed, this, &ACPlayer::Begin_shielded);
+	PlayerInputComponent->BindAction("Shield", EInputEvent::IE_Released, this, &ACPlayer::End_shielded);
 }
 
 void ACPlayer::OnMoveForward(float InValue)
@@ -145,6 +148,13 @@ float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 {
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	if (Shield->CompleteShieldAnimation())
+	{
+		damage -= Shield->ShieldHealth();
+		if (damage <= 0.0f)
+			damage = 0.0f;
+	}
+
 	Health -= damage;
 	Health = FMath::Clamp<float>(Health, 0, MaxHealth);
 	UI_Player->UpdateHealth(Health, MaxHealth);
@@ -170,7 +180,10 @@ void ACPlayer::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 
 	FDamagedData* data = InEvent->DamagedData;
 
-	data->PlayHitMotion(this);
+	if (Shield->CompleteShieldAnimation())
+		Shield->PlayShieldHittedAnimation();
+	else
+		data->PlayHitMotion(this);
 
 
 
@@ -303,5 +316,26 @@ void ACPlayer::End_Collision()
 	CheckNull(Sword);
 
 	Sword->End_Collision();
+}
+
+bool ACPlayer::Do_shield()
+{
+	CheckNullResult(Shield, false);
+
+	return Shield->DoShield();
+}
+
+void ACPlayer::Begin_shielded()
+{
+	CheckNull(Shield);
+
+	Shield->Begin_shielded();
+}
+
+void ACPlayer::End_shielded()
+{
+	CheckNull(Shield);
+
+	Shield->End_shielded();
 }
 

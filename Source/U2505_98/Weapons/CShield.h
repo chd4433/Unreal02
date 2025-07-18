@@ -15,17 +15,27 @@ private:
 	class UStaticMeshComponent* Mesh;
 
 	UPROPERTY(VisibleAnywhere)
-	class UCapsuleComponent* Capsule;
+	class UBoxComponent* Box;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Montage")
-	class UAnimMontage* ShieldMontage;
+	class UAnimMontage* ShieldHitMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montage")
-	float ShieldMontage_PlayRate = 1.0f;
+	float ShieldHitMontage_PlayRate = 1.0f;
+
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Parring")
+	float ParringTime = 1.0f;
 
 public:	
 	ACShield();
+
+public:
+	FORCEINLINE bool DoShield() { return bDoShield; }
+	FORCEINLINE bool CompleteShieldAnimation() { return bCompleteShield; }
+	FORCEINLINE const float ShieldHealth() { return SaveHealth; }
 
 private:
 	UFUNCTION()
@@ -35,9 +45,23 @@ public:
 	void Begin_shielded();
 	void End_shielded();
 
+public:
+	void PlayShieldHittedAnimation();
+
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void Tick(float DeltaTime) override;
 private:
 	class ACharacter* OwnerCharacter;
+
+private:
+	float SaveHealth;
+
+private:
+	bool bDoShield;
+	bool bCompleteShield;
+
+private:
+	float ParringCurrentTime;
+	bool bCanParring;
 };
