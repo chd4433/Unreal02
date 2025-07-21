@@ -117,12 +117,13 @@ public:
 
 	void Begin_Collision() override;
 	void End_Collision() override;
+	void Destroy_Sword() override;
 
 public:
 	bool Do_shield() override;
 	void Begin_shielded() override;
 	void End_shielded() override;
-
+	void Destroy_Shield() override;
 private:
 	class ACSword* Sword;
 

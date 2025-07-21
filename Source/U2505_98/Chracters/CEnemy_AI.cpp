@@ -15,6 +15,13 @@ FGenericTeamId ACEnemy_AI::GetGenericTeamId() const
 ACEnemy_AI::ACEnemy_AI()
 {
 	FHelpers::GetClass<ACSword>(&SwordClass, "/Script/Engine.Blueprint'/Game/Weapons/BP_CSword.BP_CSword_C'");
+
+	FHelpers::GetClass<AController>(&AIControllerClass, "/Script/Engine.Blueprint'/Game/Enemy/BP_CAIController.BP_CAIController_C'");
+
+	FHelpers::GetAsset<UBehaviorTree>(&BehaviorTree, "/Script/AIModule.BehaviorTree'/Game/Enemy/BT_Enemy_AI.BT_Enemy_AI'");
+
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ACEnemy_AI::BeginPlay()
@@ -33,6 +40,8 @@ void ACEnemy_AI::BeginPlay()
 	StartLocation = GetActorLocation();
 
 	OnSword();
+
+	
 }
 
 void ACEnemy_AI::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
@@ -42,6 +51,13 @@ void ACEnemy_AI::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Damaged);
 
 	Super::Damaged(InEvent, InAttacker);
+}
+
+void ACEnemy_AI::Dead()
+{
+	Super::Dead();
+
+	Destroy_Sword();
 }
 
 void ACEnemy_AI::End_Damaged()
@@ -149,4 +165,11 @@ void ACEnemy_AI::End_Collision()
 	CheckNull(Sword);
 
 	Sword->End_Collision();
+}
+
+void ACEnemy_AI::Destroy_Sword()
+{
+	CheckNull(Sword);
+
+	Sword->Destroy_Sword();
 }

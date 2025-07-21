@@ -44,6 +44,7 @@ private:
 public:
 	void Begin_shielded();
 	void End_shielded();
+	void Destroy_Shield();
 
 public:
 	void PlayShieldHittedAnimation();

@@ -1,0 +1,35 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "CAIGroup.generated.h"
+
+UCLASS()
+class U2505_98_API ACAIGroup : public AActor
+{
+	GENERATED_BODY()
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	TArray<TSubclassOf<class ACEnemy>> SpawnEnemies;
+
+	UPROPERTY(EditAnywhere, Category = "Settings", meta = (ClampMin = "0"))
+	uint8 EnemyCount = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float SpawnSpacing = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	bool bDebugSpawn = true;
+
+public:	
+	ACAIGroup();
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+#if WITH_EDITOR
+	void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+};

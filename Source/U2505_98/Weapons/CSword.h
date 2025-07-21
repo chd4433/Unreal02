@@ -63,6 +63,7 @@ public:
 
 	void Begin_Collision();
 	void End_Collision();
+	void Destroy_Sword();
 
 private:
 	UFUNCTION()

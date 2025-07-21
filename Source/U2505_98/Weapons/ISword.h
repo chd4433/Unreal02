@@ -39,4 +39,6 @@ public:
 
 	virtual void Begin_Collision() = 0;
 	virtual void End_Collision() = 0;
+
+	virtual void Destroy_Sword() = 0;
 };

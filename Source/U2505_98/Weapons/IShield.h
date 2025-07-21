@@ -18,4 +18,6 @@ public:
 	virtual bool Do_shield() = 0;
 	virtual void Begin_shielded() = 0;
 	virtual void End_shielded() = 0;
+
+	virtual void Destroy_Shield() = 0;
 };

@@ -19,7 +19,7 @@ private:
 	FName AIStateKey = "AIState";
 
 	UPROPERTY(EditAnywhere, Category = "Action")
-	float ActionDistance = 120;
+	float ActionDistance = 120.0f;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Mode")

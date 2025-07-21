@@ -19,7 +19,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AI")
 	uint8 TeamID = 2;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UPROPERTY(EditAnywhere, Category = "AI")
 	class UBehaviorTree* BehaviorTree;
 
 private:
@@ -32,7 +32,7 @@ public:
 public:
 	FORCEINLINE UBehaviorTree* GetBehaviorTree() { return BehaviorTree; }
 	FORCEINLINE const FVector& GetStartLocation() { return StartLocation; }
-
+	FORCEINLINE void SetAiGroupManager(class ACAIGroup* InGroupManager) { GroupManager = InGroupManager; }
 public:
 	ACEnemy_AI();
 
@@ -40,7 +40,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Damaged(struct FDamagedDataEvent* InEvent, class ACharacter* InAttacker) override;
-
+	void Dead() override;
 public:
 	void End_Damaged() override;
 
@@ -66,10 +66,15 @@ public:
 	void Begin_Collision()override;
 	void End_Collision() override;
 
+	void Destroy_Sword() override;
+
 private:
 	class ACSword* Sword;
 
 private:
 	FVector StartLocation;
+
+private:
+	class ACAIGroup* GroupManager;
 
 };

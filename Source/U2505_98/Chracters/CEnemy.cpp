@@ -9,8 +9,10 @@
 #include "Animation/AnimMontage.h"
 
 #include "CAnimInstance.h"
+#include "CEnemy_AI.h"
 #include "Weapons/CWeaponStructures.h"
 #include "Widgets/CUserWidget_Enemy.h"
+
 
 ACEnemy::ACEnemy()
 {
@@ -67,6 +69,7 @@ ACEnemy::ACEnemy()
 
 	FHelpers::GetClass<UCUserWidget_Enemy>(&UI_EnemyClass, "/Script/UMGEditor.WidgetBlueprint'/Game/Widgets/WB_Enemy.WB_Enemy_C'");
 	Widget->SetWidgetClass(UI_EnemyClass);
+	
 }
 
 void ACEnemy::BeginPlay()
@@ -84,7 +87,9 @@ void ACEnemy::BeginPlay()
 	UI_Enemy = Cast<UCUserWidget_Enemy>(Widget->GetUserWidgetObject());
 	UI_Enemy->UpdateHealth(Health, MaxHealth);
 	UI_Enemy->UpdateName(GetName());
-	UI_Enemy->UpdateControllerName(GetController()->GetName());
+	FLog::Log(GetController());
+	//ac = GetController();
+	//UI_Enemy->UpdateControllerName(GetController()->GetName());
 	
 }
 
@@ -210,12 +215,11 @@ void ACEnemy::End_Damaged()
 
 void ACEnemy::Dead()
 {
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	PlayAnimMontage(DeadMontage, DeadMontage_PlayRate);
 
 	if (!!Widget)
 		Widget->DestroyComponent();
-
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ACEnemy::End_Dead()

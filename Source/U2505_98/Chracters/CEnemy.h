@@ -73,8 +73,8 @@ protected:
 public:
 	virtual void End_Damaged();
 
-private:
-	void Dead();
+protected:
+	virtual void Dead();
 
 public:
 	void End_Dead();
@@ -87,5 +87,5 @@ private:
 
 private:
 	class UCUserWidget_Enemy* UI_Enemy;
-
+	//class AController* ac;
 };

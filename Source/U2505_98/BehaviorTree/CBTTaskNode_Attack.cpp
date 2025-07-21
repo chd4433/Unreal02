@@ -55,10 +55,14 @@ EBTNodeResult::Type UCBTTaskNode_Attack::AbortTask(UBehaviorTreeComponent& Owner
 	Super::AbortTask(OwnerComp, NodeMemory);
 
 	ACAIController* controller = Cast<ACAIController>(OwnerComp.GetOwner());
+	CheckNullResult(controller, EBTNodeResult::Aborted);
+
 
 	ACEnemy_AI* ai = Cast<ACEnemy_AI>(controller->GetPawn());
+	CheckNullResult(ai, EBTNodeResult::Aborted);
 
 	IISword* sword = Cast<IISword>(ai);
+	CheckNullResult(sword, EBTNodeResult::Aborted);
 
 	sword->End_DoAction();
 

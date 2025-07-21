@@ -66,6 +66,11 @@ void ACShield::End_shielded()
 	Box->SetCollisionProfileName("NoCollision");
 }
 
+void ACShield::Destroy_Shield()
+{
+	Destroy();
+}
+
 void ACShield::PlayShieldHittedAnimation()
 {
 	CheckNull(OwnerCharacter);

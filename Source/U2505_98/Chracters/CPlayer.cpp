@@ -213,12 +213,17 @@ void ACPlayer::End_Damaged()
 
 void ACPlayer::Dead()
 {
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	PlayAnimMontage(DeadMontage, DeadMontage_PlayRate);
 
 	if (!!UI_Player)
-		//UI_Player->Destr;
-
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	{
+		UI_Player->RemoveFromParent();
+		UI_Player = nullptr;
+	}
+	Destroy_Sword();
+	Destroy_Shield();
+	
 }
 
 void ACPlayer::End_Dead()
@@ -323,6 +328,13 @@ void ACPlayer::End_Collision()
 	Sword->End_Collision();
 }
 
+void ACPlayer::Destroy_Sword()
+{
+	CheckNull(Sword);
+
+	Sword->Destroy_Sword();
+}
+
 bool ACPlayer::Do_shield()
 {
 	CheckNullResult(Shield, false);
@@ -342,5 +354,12 @@ void ACPlayer::End_shielded()
 	CheckNull(Shield);
 
 	Shield->End_shielded();
+}
+
+void ACPlayer::Destroy_Shield()
+{
+	CheckNull(Shield);
+
+	Shield->Destroy_Shield();
 }
 
