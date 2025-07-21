@@ -3,14 +3,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CWeaponStructures.h"
-#include "IDamagable.h"
 #include "CSword.generated.h"
 
 
 UCLASS()
 class U2505_98_API ACSword 
 	: public AActor
-	, public IIDamagable
 {
 	GENERATED_BODY()
 
@@ -75,6 +73,8 @@ protected:
 
 private:
 	class ACharacter* OwnerCharacter;
+
+	class IGenericTeamAgentInterface* TeamIdOwnerCharacter;
 
 private:
 	bool bEquipped;

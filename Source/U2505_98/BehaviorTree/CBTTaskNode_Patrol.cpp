@@ -91,7 +91,15 @@ void UCBTTaskNode_Patrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 	case EPathFollowingRequestResult::AlreadyAtGoal:
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		break;
 	}
-	break;
+	
 	}
+}
+
+EBTNodeResult::Type UCBTTaskNode_Patrol::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	Super::AbortTask(OwnerComp, NodeMemory);
+
+	return EBTNodeResult::Aborted;
 }

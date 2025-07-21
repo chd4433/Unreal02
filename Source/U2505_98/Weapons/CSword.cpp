@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimMontage.h"
 #include "Engine/DataTable.h"
+#include "GenericTeamAgentInterface.h"
 
 #include "IDamagable.h"
 #include "Chracters/CPlayer.h"
@@ -209,15 +210,19 @@ void ACSword::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 {
 	CheckTrue(OtherActor == OwnerCharacter);
 
+	CheckNull(TeamIdOwnerCharacter);
+
+	IGenericTeamAgentInterface* teamIdOtherActor = Cast<IGenericTeamAgentInterface>(OtherActor);
+	CheckNull(teamIdOtherActor);
+
+	CheckTrue(TeamIdOwnerCharacter->GetGenericTeamId() == teamIdOtherActor->GetGenericTeamId());
+
 	ACShield* shield = Cast<ACShield>(OtherActor);
 	if (!!shield)
 	{
 		Shields.AddUnique(shield);
 	}
 
-	ACSword* sword = Cast<ACSword>(OtherActor);
-	if (!!sword)
-		return;
 
 	IIDamagable* other = Cast<IIDamagable>(OtherActor);
 	CheckNull(other);
@@ -242,6 +247,8 @@ void ACSword::BeginPlay()
    
    OwnerCharacter = Cast<ACharacter>(GetOwner());
    CheckNull(OwnerCharacter);
+
+   TeamIdOwnerCharacter = Cast<IGenericTeamAgentInterface>(OwnerCharacter);
 
    AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), "Back_Sword");
 

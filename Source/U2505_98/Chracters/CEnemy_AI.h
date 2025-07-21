@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Chracters/CEnemy.h"
 #include "Weapons/ISword.h"
+#include "GenericTeamAgentInterface.h"
 #include "CEnemy_AI.generated.h"
 
 
@@ -10,6 +11,7 @@ UCLASS()
 class U2505_98_API ACEnemy_AI 
 	: public ACEnemy
 	, public IISword
+	, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 	
@@ -23,8 +25,11 @@ private:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<class ACSword> SwordClass;
+
 public:
-	FORCEINLINE uint8 GetTeamID() { return TeamID; }
+	FGenericTeamId GetGenericTeamId() const override;
+
+public:
 	FORCEINLINE UBehaviorTree* GetBehaviorTree() { return BehaviorTree; }
 	FORCEINLINE const FVector& GetStartLocation() { return StartLocation; }
 

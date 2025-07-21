@@ -60,6 +60,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+public:
 	FGenericTeamId GetGenericTeamId() const override;
 
 public:	

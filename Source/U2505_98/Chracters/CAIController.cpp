@@ -38,7 +38,7 @@ void ACAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	Enemy = Cast<ACEnemy_AI>(InPawn);
-	SetGenericTeamId(Enemy->GetTeamID());
+	SetGenericTeamId(Enemy->GetGenericTeamId());
 
 	CheckNull(Enemy->GetBehaviorTree());
 	RunBehaviorTree(Enemy->GetBehaviorTree());

@@ -7,6 +7,11 @@
 #include "CAIStructures.h"
 #include "Weapons/CSword.h"
 
+FGenericTeamId ACEnemy_AI::GetGenericTeamId() const
+{
+	return FGenericTeamId(TeamID);
+}
+
 ACEnemy_AI::ACEnemy_AI()
 {
 	FHelpers::GetClass<ACSword>(&SwordClass, "/Script/Engine.Blueprint'/Game/Weapons/BP_CSword.BP_CSword_C'");
