@@ -11,7 +11,7 @@
 #include "IDamagable.h"
 #include "Chracters/CPlayer.h"
 #include "Chracters/CEnemy_AI.h"
-
+#include "CShield.h"
 
 ACSword::ACSword()
 {
@@ -173,6 +173,12 @@ void ACSword::End_DoAction()
 
 	if (FMath::IsNearlyZero(OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed))
 		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = 400;
+
+	for (ACShield* shield : Shields)
+	{
+		shield->DeleteAttackerSword(this);
+	}
+	Shields.Empty();
 }
 
 void ACSword::Begin_Combo()
@@ -202,6 +208,16 @@ void ACSword::End_Collision()
 void ACSword::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	CheckTrue(OtherActor == OwnerCharacter);
+
+	ACShield* shield = Cast<ACShield>(OtherActor);
+	if (!!shield)
+	{
+		Shields.AddUnique(shield);
+	}
+
+	ACSword* sword = Cast<ACSword>(OtherActor);
+	if (!!sword)
+		return;
 
 	IIDamagable* other = Cast<IIDamagable>(OtherActor);
 	CheckNull(other);

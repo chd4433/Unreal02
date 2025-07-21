@@ -48,6 +48,10 @@ public:
 public:
 	void PlayShieldHittedAnimation();
 
+public:
+	bool CheckAttackerSword(class ACSword* InValue);
+	void DeleteAttackerSword(class ACSword* InValue);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -64,4 +68,7 @@ private:
 private:
 	float ParringCurrentTime;
 	bool bCanParring;
+
+private:
+	TMap<class ACSword*, bool> SwordOverlapMap;
 };

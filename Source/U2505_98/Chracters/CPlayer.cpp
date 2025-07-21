@@ -148,13 +148,18 @@ float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 {
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (Shield->CompleteShieldAnimation())
+	if (!!Shield)
 	{
-		damage -= Shield->ShieldHealth();
-		if (damage <= 0.0f)
-			damage = 0.0f;
+		ACSword* sword = Cast<ACSword>(DamageCauser);
+		if (!!sword && Shield->CheckAttackerSword(sword))
+		{
+			damage -= Shield->ShieldHealth();
+			if (damage <= 0.0f)
+				damage = 0.0f;
+		}
 	}
 
+	FLog::Print(damage);
 	Health -= damage;
 	Health = FMath::Clamp<float>(Health, 0, MaxHealth);
 	UI_Player->UpdateHealth(Health, MaxHealth);

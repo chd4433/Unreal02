@@ -97,4 +97,7 @@ private:
 
 private:
 	TArray<class IIDamagable*> Hitted;
+
+private:
+	TArray<class ACShield*> Shields;
 };
