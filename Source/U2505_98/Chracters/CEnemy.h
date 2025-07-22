@@ -77,7 +77,7 @@ protected:
 	virtual void Dead();
 
 public:
-	void End_Dead();
+	virtual void End_Dead();
 
 private:
 	TArray<class UMaterialInstanceDynamic*> Materials;

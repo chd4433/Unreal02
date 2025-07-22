@@ -33,6 +33,8 @@ public:
 	FORCEINLINE UBehaviorTree* GetBehaviorTree() { return BehaviorTree; }
 	FORCEINLINE const FVector& GetStartLocation() { return StartLocation; }
 	FORCEINLINE void SetAiGroupManager(class ACAIGroup* InGroupManager) { GroupManager = InGroupManager; }
+	FORCEINLINE const bool GetDead() { return bDead; }
+	FORCEINLINE const bool GetFirstHitted() { return bFirstHitted; }
 public:
 	ACEnemy_AI();
 
@@ -43,7 +45,7 @@ protected:
 	void Dead() override;
 public:
 	void End_Damaged() override;
-
+	void End_Dead()override;
 public:
 	void OnSword() override;
 
@@ -77,4 +79,7 @@ private:
 private:
 	class ACAIGroup* GroupManager;
 
+private:
+	bool bDead;
+	bool bFirstHitted;
 };

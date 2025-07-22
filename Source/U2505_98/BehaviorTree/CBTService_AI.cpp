@@ -24,11 +24,13 @@ void UCBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 
 	ACEnemy_AI* ai = Cast<ACEnemy_AI>(controller->GetPawn());
 	CheckNull(ai);
+	CheckTrue(ai->GetDead());
 
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	CheckNull(blackboard);
 
 	ACharacter* target = Cast<ACharacter>(blackboard->GetValueAsObject(TargetKey));
+
 
 	if (target == nullptr)
 	{
@@ -47,12 +49,12 @@ void UCBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	IISword* sword = Cast<IISword>(ai);
 	CheckNull(sword);
 
-	if (sword->IsEquipped() == false)
-	{
-		blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Equip);
+	//if (sword->IsEquipped() == false)
+	//{
+	//	blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Equip);
 
-		return;
-	}
+	//	return;
+	//}
 
 	float distance = ai->GetDistanceTo(target);
 
@@ -67,7 +69,7 @@ void UCBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	{
 		if (sword->IsAttacking() == false)
 			blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Attack);
-
+		
 		return;
 	}
 }

@@ -209,6 +209,9 @@ void ACPlayer::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 void ACPlayer::End_Damaged()
 {
 	bCanMove = true;
+	CheckNull(Sword);
+	if (Sword->IsAttacking())
+		Sword->End_DoAction();
 }
 
 void ACPlayer::Dead()
@@ -221,14 +224,14 @@ void ACPlayer::Dead()
 		UI_Player->RemoveFromParent();
 		UI_Player = nullptr;
 	}
-	Destroy_Sword();
-	Destroy_Shield();
-	
 }
 
 void ACPlayer::End_Dead()
 {
 	Destroy();
+
+	Destroy_Sword();
+	Destroy_Shield();
 }
 
 void ACPlayer::OnSword()
@@ -333,6 +336,7 @@ void ACPlayer::Destroy_Sword()
 	CheckNull(Sword);
 
 	Sword->Destroy_Sword();
+	Sword = nullptr;
 }
 
 bool ACPlayer::Do_shield()
@@ -361,5 +365,6 @@ void ACPlayer::Destroy_Shield()
 	CheckNull(Shield);
 
 	Shield->Destroy_Shield();
+	Shield = nullptr;
 }
 

@@ -6,6 +6,7 @@
 
 #include "Chracters/CAIController.h"
 #include "Chracters/CEnemy_AI.h"
+#include "Chracters/CAIStructures.h"
 
 
 UCBTTaskNode_Patrol::UCBTTaskNode_Patrol()
@@ -29,8 +30,8 @@ EBTNodeResult::Type UCBTTaskNode_Patrol::ExecuteTask(UBehaviorTreeComponent& Own
 	CheckNullResult(blackboard, EBTNodeResult::Failed);
 
 
-	FVector start = ai->GetStartLocation();
-	//FVector start = ai->GetActorLocation();
+	//FVector start = ai->GetStartLocation();
+	FVector start = ai->GetActorLocation();
 
 	UNavigationSystemV1* navigation = FNavigationSystem::GetCurrent<UNavigationSystemV1>(ai->GetWorld());
 	CheckNullResult(navigation, EBTNodeResult::Failed);
@@ -77,6 +78,14 @@ void UCBTTaskNode_Patrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	CheckNull(blackboard);
+
+	EAIStateType type = (EAIStateType)blackboard->GetValueAsEnum("AIState");
+	if (type != EAIStateType::Partrol)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return;
+	}
+
 
 	FVector goal = blackboard->GetValueAsVector(PatrolKey);
 	EPathFollowingRequestResult::Type result = controller->MoveToLocation(goal, AcceptanceRadius, false);

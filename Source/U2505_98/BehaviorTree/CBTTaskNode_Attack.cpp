@@ -1,8 +1,10 @@
 #include "BehaviorTree/CBTTaskNode_Attack.h"
 #include "Global.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 #include "Chracters/CAIController.h"
 #include "Chracters/CEnemy_AI.h"
+#include "Chracters/CAIStructures.h"
 #include "Weapons/ISword.h"
 
 UCBTTaskNode_Attack::UCBTTaskNode_Attack()
@@ -26,6 +28,16 @@ EBTNodeResult::Type UCBTTaskNode_Attack::ExecuteTask(UBehaviorTreeComponent& Own
 	CheckNullResult(sword, EBTNodeResult::Failed);
 	CheckFalseResult(sword->IsEquipped(), EBTNodeResult::Failed);
 
+	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
+	CheckNullResult(blackboard, EBTNodeResult::Failed);
+
+	EAIStateType type = (EAIStateType)blackboard->GetValueAsEnum("AIState");
+	if (type != EAIStateType::Attack)
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return EBTNodeResult::Failed;
+	}
+
 	controller->StopMovement();
 	sword->OnDoAction();
 
@@ -44,7 +56,6 @@ void UCBTTaskNode_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 
 	IISword* sword = Cast<IISword>(ai);
 	CheckNull(sword);
-
 
 	if (sword->IsAttacking() == false)
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

@@ -1,5 +1,10 @@
 #include "Chracters/CAIGroup.h"
 #include "Global.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
+
+#include "CAIController.h"
+#include "CAIStructures.h"
 #include "CEnemy.h"
 #include "CEnemy_AI.h"
 
@@ -23,6 +28,9 @@ void ACAIGroup::BeginPlay()
 
 		   FVector SpawnLocation = BaseLocation + RightVector * SpawnSpacing * i;
 		   SpawnLocation.Z = BaseLocation.Z + 90;
+		   int32 FrontSpacing = FMath::RandRange(100, 300);
+		   int32 code = i % 2 == 0 ? (1) : (-1);
+		   SpawnLocation.Y += static_cast<double>(code * FrontSpacing);
 		   FRotator SpawnRotation = GetActorRotation();
 
 		   FActorSpawnParameters params;
@@ -35,11 +43,12 @@ void ACAIGroup::BeginPlay()
 			   SpawnRotation,
 			   params
 		   );
-
+		  
 
 		   ACEnemy_AI* enemy_Ai = Cast<ACEnemy_AI>(SpawnedEnemy);
 		   if (!!enemy_Ai)
 		   {
+			   Enemies_AI.Add(enemy_Ai);
 			   enemy_Ai->SetAiGroupManager(this);
 			   enemy_Ai->AutoPossessAI = EAutoPossessAI::Spawned;
 		   }
@@ -51,6 +60,37 @@ void ACAIGroup::BeginPlay()
    
 }
 
+void ACAIGroup::GoToLocation_AllEnemies(FVector Location)
+{
+	if (bFirstHitted == false)
+	{
+		for (ACEnemy_AI* enemy : Enemies_AI)
+		{
+			if (enemy->GetFirstHitted())
+				continue;
+			FVector2D rand = GetRandomPointMinMax(200, 500);
+			FVector randLocation = FVector(Location.X + rand.X, Location.Y + rand.Y, Location.Z);
+			//DrawDebugSphere(GetWorld(), randLocation, 25, 40, FColor::Green, false, 5.0f);
+			ACAIController* controller = enemy->GetController<ACAIController>();
+			UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
+			blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::GoToLocation);
+			blackboard->SetValueAsVector("GoToLocation", randLocation);
+		}
+		bFirstHitted = true;
+	}
+}
+
+FVector2D ACAIGroup::GetRandomPointMinMax(float MinRadius, float MaxRadius)
+{
+	float Angle = FMath::FRandRange(0.f, 2 * PI);
+
+	float Radius = FMath::Sqrt(FMath::FRandRange(MinRadius * MinRadius, MaxRadius * MaxRadius));
+
+	float X = Radius * FMath::Cos(Angle);
+	float Y = Radius * FMath::Sin(Angle);
+
+	return FVector2D(X, Y);
+}
 
 #if WITH_EDITOR
 void ACAIGroup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)

@@ -28,8 +28,20 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+public:
+	void GoToLocation_AllEnemies(FVector Location);
+
+private:
+	FVector2D GetRandomPointMinMax(float MinRadius, float MaxRadius);
+
 private:
 #if WITH_EDITOR
 	void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
+
+private:
+	TArray<class ACEnemy_AI*> Enemies_AI;
+
+private:
+	bool bFirstHitted;
 };

@@ -6,6 +6,7 @@
 #include "CAIController.h"
 #include "CAIStructures.h"
 #include "Weapons/CSword.h"
+#include "CAIGroup.h"
 
 FGenericTeamId ACEnemy_AI::GetGenericTeamId() const
 {
@@ -19,7 +20,6 @@ ACEnemy_AI::ACEnemy_AI()
 	FHelpers::GetClass<AController>(&AIControllerClass, "/Script/Engine.Blueprint'/Game/Enemy/BP_CAIController.BP_CAIController_C'");
 
 	FHelpers::GetAsset<UBehaviorTree>(&BehaviorTree, "/Script/AIModule.BehaviorTree'/Game/Enemy/BT_Enemy_AI.BT_Enemy_AI'");
-
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
@@ -50,14 +50,23 @@ void ACEnemy_AI::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Damaged);
 
+	if (!!GroupManager)
+	{
+		bFirstHitted = true;
+		GroupManager->GoToLocation_AllEnemies(GetActorLocation());
+	}
+
 	Super::Damaged(InEvent, InAttacker);
 }
 
 void ACEnemy_AI::Dead()
 {
+	ACAIController* controller = GetController<ACAIController>();
+	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
+	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Wait);
+	bDead = true;
 	Super::Dead();
 
-	Destroy_Sword();
 }
 
 void ACEnemy_AI::End_Damaged()
@@ -67,6 +76,13 @@ void ACEnemy_AI::End_Damaged()
 	ACAIController* controller = GetController<ACAIController>();
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Wait);
+}
+
+void ACEnemy_AI::End_Dead()
+{
+	Super::End_Dead();
+
+	Destroy_Sword();
 }
 
 void ACEnemy_AI::OnSword()
@@ -172,4 +188,5 @@ void ACEnemy_AI::Destroy_Sword()
 	CheckNull(Sword);
 
 	Sword->Destroy_Sword();
+	Sword = nullptr;
 }
