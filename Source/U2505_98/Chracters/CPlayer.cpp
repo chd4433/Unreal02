@@ -84,6 +84,29 @@ void ACPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bRotation)
+	{
+		FRotator CurrentRotation = GetActorRotation();
+		FRotator TargetRotation = GetControlRotation();
+
+		TargetRotation.Pitch = 0.f;
+		TargetRotation.Roll = 0.f;
+
+		// 보간 처리: 속도 5.0 정도 조절 가능
+		FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 5.0f);
+		SetActorRotation(SmoothRotation);
+		
+		if (SmoothRotation.Equals(TargetRotation, 0.5f)) 
+		{
+			bRotation = false;
+			SetActorRotation(TargetRotation); 
+
+			bUseControllerRotationYaw = true;
+			GetCharacterMovement()->bOrientRotationToMovement = false;
+		}
+
+	}
+
 }
 
 void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

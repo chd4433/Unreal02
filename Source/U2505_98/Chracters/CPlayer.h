@@ -56,6 +56,9 @@ private:
 	float MaxHealth = 100;
 
 public:
+	FORCEINLINE void SetbRotation(bool InRotation) {  bRotation = InRotation; }
+
+public:
 	ACPlayer();
 
 protected:
@@ -136,4 +139,5 @@ private:
 private:
 	float Health;
 	bool bCanMove;
+	bool bRotation;
 };

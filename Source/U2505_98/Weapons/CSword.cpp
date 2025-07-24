@@ -132,9 +132,15 @@ void ACSword::End_Equip()
 	{
 		bEquipped = true;
 
+		ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+		if (player == nullptr)
+		{
+			OwnerCharacter->bUseControllerRotationYaw = true;
+			OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+			return;
+		}
 
-		OwnerCharacter->bUseControllerRotationYaw = true;
-		OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = false;
+		player->SetbRotation(true);
 	}
 }
 
