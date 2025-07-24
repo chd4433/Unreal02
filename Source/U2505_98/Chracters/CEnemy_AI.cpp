@@ -13,8 +13,26 @@ FGenericTeamId ACEnemy_AI::GetGenericTeamId() const
 	return FGenericTeamId(TeamID);
 }
 
+void ACEnemy_AI::SetCountEnemy(ACEnemy_AI* InEnemy)
+{
+	CountEnemy = InEnemy;
+
+	ACAIController* controller = GetController<ACAIController>();
+	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
+	blackboard->SetValueAsObject("GroupTarget", Cast<ACharacter>(CountEnemy));
+	//blackboard->SetValueAsObject("Target", CountEnemy);
+}
+
+void ACEnemy_AI::InitializeGroupFighting()
+{
+	bFinishGoToLocation = false;
+	bFirstHitted = false;
+}
+
 ACEnemy_AI::ACEnemy_AI()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	FHelpers::GetClass<ACSword>(&SwordClass, "/Script/Engine.Blueprint'/Game/Weapons/BP_CSword.BP_CSword_C'");
 
 	FHelpers::GetClass<AController>(&AIControllerClass, "/Script/Engine.Blueprint'/Game/Enemy/BP_CAIController.BP_CAIController_C'");
@@ -44,16 +62,40 @@ void ACEnemy_AI::BeginPlay()
 	
 }
 
+void ACEnemy_AI::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!!CountEnemy)
+	{
+		if (CountEnemy->bDead)
+			CountEnemy = nullptr;
+	}
+}
+
 void ACEnemy_AI::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 {
 	ACAIController* controller = GetController<ACAIController>();
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Damaged);
+	ACEnemy_AI* attacker = Cast<ACEnemy_AI>(InAttacker);
 
-	if (!!GroupManager)
+	if (!!GroupManager && bFirstHitted == false)
 	{
 		bFirstHitted = true;
 		GroupManager->GoToLocation_AllEnemies(GetActorLocation());
+		//Set Group Fighting
+		if (attacker && attacker->GetAiGroupManager() && !(GroupManager->GetFightingGroup()) && !(attacker->GetAiGroupManager()->GetFightingGroup()))
+		{
+			SetCountEnemy(attacker);
+			attacker->SetCountEnemy(this);
+
+			bFinishGoToLocation = true;
+			attacker->SetFinishGoToLocation(true);
+
+			GroupManager->SetFightingGroup(attacker->GetAiGroupManager());
+			attacker->GetAiGroupManager()->SetFightingGroup(GroupManager);
+		}
 	}
 
 	Super::Damaged(InEvent, InAttacker);
@@ -65,6 +107,7 @@ void ACEnemy_AI::Dead()
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Wait);
 	bDead = true;
+	GroupManager->RemoveEnemy(this);
 	Super::Dead();
 
 }

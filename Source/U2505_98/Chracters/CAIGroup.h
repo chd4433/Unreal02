@@ -22,17 +22,30 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bDebugSpawn = true;
 
+public:
+	FORCEINLINE const ACAIGroup* GetFightingGroup() { return FightingGroup; }
+	FORCEINLINE void SetFightingGroup(ACAIGroup* InGroup) { FightingGroup = InGroup; }
+
+	FORCEINLINE TArray<class ACEnemy_AI*> GetEnemiesArray() { return Enemies_AI; }
+
 public:	
 	ACAIGroup();
 
 protected:
 	virtual void BeginPlay() override;
 
+private:
+	void Tick(float DeltaTime) override;
+
 public:
 	void GoToLocation_AllEnemies(FVector Location);
 
 private:
 	FVector2D GetRandomPointMinMax(float MinRadius, float MaxRadius);
+
+public:
+	void FindFightingEnemy();
+	void RemoveEnemy(class ACEnemy_AI* InEnemy);
 
 private:
 #if WITH_EDITOR
@@ -44,4 +57,7 @@ private:
 
 private:
 	bool bFirstHitted;
+
+private:
+	ACAIGroup* FightingGroup;
 };

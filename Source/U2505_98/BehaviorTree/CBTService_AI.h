@@ -16,6 +16,9 @@ private:
 	FName TargetKey = "Target";
 
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FName GroupTargetKey = "GroupTarget";
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FName AIStateKey = "AIState";
 
 	UPROPERTY(EditAnywhere, Category = "Action")

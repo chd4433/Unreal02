@@ -10,7 +10,7 @@
 
 ACAIGroup::ACAIGroup()
 {
-   
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ACAIGroup::BeginPlay()
@@ -60,6 +60,30 @@ void ACAIGroup::BeginPlay()
    
 }
 
+void ACAIGroup::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!!FightingGroup)
+	{
+		bool bAllDead = true;
+		for (ACEnemy_AI* enemy : FightingGroup->GetEnemiesArray())
+			if (enemy->GetDead() == false)
+			{
+				bAllDead = false;
+				break;
+			}
+		
+		if (bAllDead)
+		{
+			FightingGroup = nullptr;
+			bFirstHitted = false;
+			for (ACEnemy_AI* enemy : Enemies_AI)
+				enemy->InitializeGroupFighting();
+		}
+	}
+}
+
 void ACAIGroup::GoToLocation_AllEnemies(FVector Location)
 {
 	if (bFirstHitted == false)
@@ -72,7 +96,9 @@ void ACAIGroup::GoToLocation_AllEnemies(FVector Location)
 			FVector randLocation = FVector(Location.X + rand.X, Location.Y + rand.Y, Location.Z);
 			//DrawDebugSphere(GetWorld(), randLocation, 25, 40, FColor::Green, false, 5.0f);
 			ACAIController* controller = enemy->GetController<ACAIController>();
+			CheckNull(controller);
 			UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
+			CheckNull(blackboard);
 			blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::GoToLocation);
 			blackboard->SetValueAsVector("GoToLocation", randLocation);
 		}
@@ -90,6 +116,52 @@ FVector2D ACAIGroup::GetRandomPointMinMax(float MinRadius, float MaxRadius)
 	float Y = Radius * FMath::Sin(Angle);
 
 	return FVector2D(X, Y);
+}
+
+void ACAIGroup::FindFightingEnemy()
+{
+	if (!!FightingGroup)
+	{
+		for (ACEnemy_AI* enemy : Enemies_AI)
+		{
+			if (enemy->GetFinishGoToLocation())
+			{
+				if (enemy->GetCountEnemy() == nullptr)
+				{
+					ACEnemy_AI* ClosestEnemy = nullptr;
+					float ClosestDistance = TNumericLimits<float>::Max();
+
+					for (ACEnemy_AI* FightingEnemy : FightingGroup->GetEnemiesArray())
+					{
+						if (FightingEnemy->GetCountEnemy() == nullptr && FightingEnemy->GetDead() == false)
+						{
+							float Distance = FVector::Dist(enemy->GetActorLocation(), FightingEnemy->GetActorLocation());
+
+							if (Distance < ClosestDistance)
+							{
+								ClosestDistance = Distance;
+								ClosestEnemy = FightingEnemy;
+							}
+						}
+					}//for FightingGroup->GetEnemiesArray()
+
+					if (!!ClosestEnemy)
+					{
+						enemy->SetCountEnemy(ClosestEnemy);
+						ClosestEnemy->SetCountEnemy(enemy);
+					}
+				}
+			}
+		}//for Enemies_AI
+
+	}
+}
+
+void ACAIGroup::RemoveEnemy(ACEnemy_AI* InEnemy)
+{
+	CheckFalse(InEnemy->GetDead());
+
+	Enemies_AI.Remove(InEnemy);
 }
 
 #if WITH_EDITOR

@@ -32,15 +32,32 @@ public:
 public:
 	FORCEINLINE UBehaviorTree* GetBehaviorTree() { return BehaviorTree; }
 	FORCEINLINE const FVector& GetStartLocation() { return StartLocation; }
+
+	FORCEINLINE class ACAIGroup* GetAiGroupManager() { return GroupManager; }
 	FORCEINLINE void SetAiGroupManager(class ACAIGroup* InGroupManager) { GroupManager = InGroupManager; }
+	
 	FORCEINLINE const bool GetDead() { return bDead; }
+
 	FORCEINLINE const bool GetFirstHitted() { return bFirstHitted; }
+
+	FORCEINLINE const bool GetFinishGoToLocation() { return bFinishGoToLocation; }
+	FORCEINLINE void SetFinishGoToLocation(bool InFinish) {  bFinishGoToLocation = InFinish; }
+	
+	FORCEINLINE const ACEnemy_AI* GetCountEnemy() { return CountEnemy; }
+	void SetCountEnemy(ACEnemy_AI* InEnemy);
+
+public:
+	void InitializeGroupFighting();
+
 public:
 	ACEnemy_AI();
 
 protected:
 	virtual void BeginPlay() override;
+private:
+	void Tick(float DeltaTime) override;
 
+protected:
 	void Damaged(struct FDamagedDataEvent* InEvent, class ACharacter* InAttacker) override;
 	void Dead() override;
 public:
@@ -78,8 +95,10 @@ private:
 
 private:
 	class ACAIGroup* GroupManager;
+	ACEnemy_AI* CountEnemy;
+	bool bFinishGoToLocation;
+	bool bFirstHitted;
 
 private:
 	bool bDead;
-	bool bFirstHitted;
 };
