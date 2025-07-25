@@ -87,6 +87,9 @@ void ACEnemy_AI::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 		//Set Group Fighting
 		if (attacker && attacker->GetAiGroupManager() && !(GroupManager->GetFightingGroup()) && !(attacker->GetAiGroupManager()->GetFightingGroup()))
 		{
+			attacker->SetFirstHitted(true);
+			attacker->GetAiGroupManager()->GoToLocation_AllEnemies(attacker->GetActorLocation());
+
 			SetCountEnemy(attacker);
 			attacker->SetCountEnemy(this);
 

@@ -202,10 +202,20 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 	}
 
 	FVector point;
-	if (InEvent->Collision->GetClosestPointOnCollision(GetActorLocation(), point) > 0.0f)
+	if (!!(InEvent->Collision))
 	{
-		data->PlayEffect(this, point);
+		if (InEvent->Collision->GetClosestPointOnCollision(GetActorLocation(), point) > 0.0f)
+		{
+			data->PlayEffect(this, point);
+		}
 	}
+	else
+	{
+		data->PlayEffect(this, GetActorLocation());
+	}
+		
+		
+	
 
 }
 

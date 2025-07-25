@@ -92,7 +92,7 @@ void ACPlayer::Tick(float DeltaTime)
 		TargetRotation.Pitch = 0.f;
 		TargetRotation.Roll = 0.f;
 
-		// 보간 처리: 속도 5.0 정도 조절 가능
+		
 		FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 5.0f);
 		SetActorRotation(SmoothRotation);
 		
@@ -171,14 +171,27 @@ float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 {
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	ACharacter* attacker = Cast<ACharacter>(EventInstigator->GetPawn());
+
 	if (!!Shield)
 	{
 		ACSword* sword = Cast<ACSword>(DamageCauser);
-		if (!!sword && Shield->CheckAttackerSword(sword))
+		if (!!sword)
 		{
-			damage -= Shield->ShieldHealth();
-			if (damage <= 0.0f)
-				damage = 0.0f;
+			if (Shield->CheckAttackerSword(sword))
+			{
+				if (Shield->GetCanParring())
+				{
+					Shield->PlayShieldParringAnimation();
+					Shield->SendParringDamage(this, attacker);
+					return 0;
+				}
+
+				damage -= Shield->ShieldHealth();
+				if (damage <= 0.0f)
+					damage = 0.0f;
+			}
+			
 		}
 	}
 
@@ -195,7 +208,7 @@ float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	}
 
 
-	ACharacter* attacker = Cast<ACharacter>(EventInstigator->GetPawn());
+	
 
 	Damaged((FDamagedDataEvent*)&DamageEvent, attacker);
 

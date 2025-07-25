@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/BoxComponent.h"
 #include "Animation/AnimMontage.h"
+#include "Particles/ParticleSystem.h"
 
 #include "Chracters/CAnimInstance.h"
 #include "CSword.h"
@@ -28,6 +29,18 @@ ACShield::ACShield()
 	Box->SetCollisionProfileName("NoCollision");
 
 	FHelpers::GetAsset<UAnimMontage>(&ShieldHitMontage, "/Script/Engine.AnimMontage'/Game/Montages/Shield/Shield_Hit_Montage.Shield_Hit_Montage'");
+
+	FHelpers::GetAsset<UAnimMontage>(&ShieldParringMontage, "/Script/Engine.AnimMontage'/Game/Montages/Shield/Shield_Parring_Montage.Shield_Parring_Montage'");
+	FHelpers::GetAsset<UAnimMontage>(&ShieldParringMontage, "/Script/Engine.AnimMontage'/Game/Montages/Shield/Shield_Parring_Montage.Shield_Parring_Montage'");
+	//ParringDamage Setting
+	FHelpers::GetAsset<UAnimMontage>(&ParringDamagedData.Montage, "/Script/Engine.AnimMontage'/Game/Montages/Stun_Montage.Stun_Montage'");
+	FHelpers::GetAsset<UParticleSystem>(&ParringDamagedData.Effect, "/Script/Engine.ParticleSystem'/Game/AdvancedMagicFX12/particles/P_ky_hit_dark.P_ky_hit_dark'");
+	ParringDamagedData.EffectScale = FVector(0.3f, 0.3f, 0.3f);
+	ParringDamagedData.Power = 10.f;
+	ParringDamagedData.Launch = 100.f;
+	ParringDamagedData.StopTime = 0.05f;
+
+	
 
 	ParringCurrentTime = 0.0f;
 	SaveHealth = 5.0f;
@@ -77,6 +90,19 @@ void ACShield::PlayShieldHittedAnimation()
 
 	OwnerCharacter->PlayAnimMontage(ShieldHitMontage, ShieldHitMontage_PlayRate);
 
+}
+
+void ACShield::PlayShieldParringAnimation()
+{
+	CheckNull(OwnerCharacter);
+	CheckFalse(bCanParring);
+
+	OwnerCharacter->PlayAnimMontage(ShieldParringMontage, ShieldParringMontage_PlayRate);
+}
+
+void ACShield::SendParringDamage(ACharacter* InOwner,ACharacter* InAttacker, bool bFirstHit)
+{
+	ParringDamagedData.SendDamage(InOwner, this, nullptr, InAttacker, bFirstHit);
 }
 
 bool ACShield::CheckAttackerSword(ACSword* InValue)

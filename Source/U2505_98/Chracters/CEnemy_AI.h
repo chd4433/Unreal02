@@ -39,6 +39,7 @@ public:
 	FORCEINLINE const bool GetDead() { return bDead; }
 
 	FORCEINLINE const bool GetFirstHitted() { return bFirstHitted; }
+	FORCEINLINE void  SetFirstHitted(bool InBool) { bFirstHitted = InBool; }
 
 	FORCEINLINE const bool GetFinishGoToLocation() { return bFinishGoToLocation; }
 	FORCEINLINE void SetFinishGoToLocation(bool InFinish) {  bFinishGoToLocation = InFinish; }

@@ -36,5 +36,7 @@ void UCBTTaskNode_Damaged::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	EAIStateType type = (EAIStateType)blackboard->GetValueAsEnum("AIState");
 
 	if (type != EAIStateType::Damaged)
+	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 }

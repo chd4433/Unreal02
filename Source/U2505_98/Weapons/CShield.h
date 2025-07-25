@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "CWeaponStructures.h"
 #include "CShield.generated.h"
 
 UCLASS()
@@ -27,6 +28,12 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Parring")
+	class UAnimMontage* ShieldParringMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Parring")
+	float ShieldParringMontage_PlayRate = 2.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Parring")
 	float ParringTime = 1.0f;
 
 public:	
@@ -36,6 +43,7 @@ public:
 	FORCEINLINE bool DoShield() { return bDoShield; }
 	FORCEINLINE bool CompleteShieldAnimation() { return bCompleteShield; }
 	FORCEINLINE const float ShieldHealth() { return SaveHealth; }
+	FORCEINLINE const bool GetCanParring() { return bCanParring; }
 
 private:
 	UFUNCTION()
@@ -48,6 +56,10 @@ public:
 
 public:
 	void PlayShieldHittedAnimation();
+
+public:
+	void PlayShieldParringAnimation();
+	void SendParringDamage(class ACharacter* InOwner, class ACharacter* InAttacker, bool bFirstHit = true);
 
 public:
 	bool CheckAttackerSword(class ACSword* InValue);
@@ -67,9 +79,12 @@ private:
 	bool bCompleteShield;
 
 private:
+	FDamagedData ParringDamagedData;
 	float ParringCurrentTime;
 	bool bCanParring;
 
 private:
 	TMap<class ACSword*, bool> SwordOverlapMap;
+
+
 };
