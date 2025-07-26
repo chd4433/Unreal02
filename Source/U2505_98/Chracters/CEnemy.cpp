@@ -215,7 +215,11 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 	}
 		
 		
-	
+	if (data->bUpper)
+	{
+		FVector uppderDirection = FVector(0.0f, 0.0f, 1.0f);
+		LaunchCharacter(uppderDirection * data->UpperLaunch, false, false);
+	}
 
 }
 

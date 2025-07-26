@@ -35,6 +35,7 @@ ACSword::ACSword()
 
 	FHelpers::GetAsset<UDataTable>(&WeaponDataTable, "/Script/Engine.DataTable'/Game/Weapons/DT_PlayerAttack.DT_PlayerAttack'");
 
+	//FHelpers::GetAsset<UDataTable>(&DamagedDataTable, "/Script/Engine.DataTable'/Game/Weapons/DT_DamagedData.DT_DamagedData'");
 	FHelpers::GetAsset<UDataTable>(&DamagedDataTable, "/Script/Engine.DataTable'/Game/Weapons/DT_DamagedData.DT_DamagedData'");
 
 }
@@ -144,7 +145,7 @@ void ACSword::End_Equip()
 	}
 }
 
-void ACSword::DoAction()
+void ACSword::DoAction(ESwordAttackType InType)
 {
 	CheckFalse(bEquipped);
 	CheckTrue(bEquipping);
@@ -159,7 +160,7 @@ void ACSword::DoAction()
 
 	CheckTrue(bAttacking);
 	bAttacking = true;
-
+	Index = static_cast<uint8>(InType);
 	ActionDatas[Index].PlayMontage(OwnerCharacter);
 }
 
@@ -174,7 +175,7 @@ void ACSword::Begin_DoAction()
 void ACSword::End_DoAction()
 {
 	bAttacking = false;
-	Index = 0;
+	Index = static_cast<uint8>(ESwordAttackType::BasicAttack_First);
 	bEnable = false;
 	bExist = false;
 
@@ -200,13 +201,17 @@ void ACSword::End_Combo()
 
 void ACSword::Begin_Collision()
 {
+	FLog::Log("Begin_Empty");
+	Hitted.Empty();
+
 	Capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-	Hitted.Empty();
 }
 
 void ACSword::End_Collision()
 {
+	FLog::Log("End_Empty");
+
 	Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	Hitted.Empty();
@@ -239,15 +244,21 @@ void ACSword::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 	CheckNull(other);
 
 	CheckFalse(Hitted.Find(other) == INDEX_NONE);
-	Hitted.Add(other);
+	Hitted.AddUnique(other);
 
-	//FLog::Print(OtherActor);
 	CheckFalse(Index < (int32)DamagedDatas.Num());
 
 
 	ACharacter* attacker = Cast<ACharacter>(GetOwner());
 	UShapeComponent* collision = Cast<UShapeComponent>(OverlappedComponent);
 	ACharacter* ohterCharacter = Cast<ACharacter>(OtherActor);
+	int b = 0;
+	for (auto a : Hitted)
+	{
+		FLog::Log(b);
+		FLog::Log(Cast<ACharacter>(a)->GetName());
+		b++;
+	}
 
 	DamagedDatas[Index].SendDamage(attacker, this, collision, ohterCharacter, Hitted.Num() <= 1);
 }

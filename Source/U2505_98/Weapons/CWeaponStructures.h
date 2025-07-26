@@ -71,6 +71,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UCameraShakeBase> CameraShake = nullptr;
 
+	UPROPERTY(EditAnywhere)
+	bool bUpper;
+
+	UPROPERTY(EditAnywhere)
+	float UpperLaunch;
+
 public:
 	void SendDamage(class ACharacter* InAttacker, class AActor* InAttackCauser, class UShapeComponent* InAttackCollision, class ACharacter* InOther, bool bFirstHit);
 

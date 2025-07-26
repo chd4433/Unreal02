@@ -102,6 +102,7 @@ public:
 private:
 	void OnSword() override;
 	void OnDoAction() override;
+	void UpperAction() override;
 
 public:
 	bool IsEquipped() override;

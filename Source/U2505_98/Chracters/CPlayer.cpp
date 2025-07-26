@@ -123,6 +123,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("Sword", EInputEvent::IE_Pressed, this, &ACPlayer::OnSword);
 	PlayerInputComponent->BindAction("Action", EInputEvent::IE_Pressed, this, &ACPlayer::OnDoAction);
+	PlayerInputComponent->BindAction("UpperAttack", EInputEvent::IE_Pressed, this, &ACPlayer::UpperAction);
 
 	PlayerInputComponent->BindAction("Shield", EInputEvent::IE_Pressed, this, &ACPlayer::Begin_shielded);
 	PlayerInputComponent->BindAction("Shield", EInputEvent::IE_Released, this, &ACPlayer::End_shielded);
@@ -323,6 +324,13 @@ void ACPlayer::OnDoAction()
 	CheckNull(Sword);
 
 	Sword->DoAction();
+}
+
+void ACPlayer::UpperAction()
+{
+	CheckNull(Sword);
+
+	Sword->DoAction(ESwordAttackType::UpperAttack);
 }
 
 void ACPlayer::Begin_DoAction()

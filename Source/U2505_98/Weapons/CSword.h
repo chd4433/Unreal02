@@ -6,6 +6,12 @@
 #include "CSword.generated.h"
 
 
+enum class ESwordAttackType : uint8
+{
+	BasicAttack_First = 0, BasicAttack_Second, BasicAttack_Third,UpperAttack, UpperCombo_First, UpperCombo_Second, UpperCombo_Third, Max,
+};
+
+
 UCLASS()
 class U2505_98_API ACSword 
 	: public AActor
@@ -53,7 +59,7 @@ public:
 	void End_Equip();
 
 public:
-	void DoAction();
+	void DoAction(ESwordAttackType InType = ESwordAttackType::BasicAttack_First);
 	void Begin_DoAction();
 	void End_DoAction();
 

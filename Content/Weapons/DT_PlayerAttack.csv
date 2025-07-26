@@ -4,3 +4,4 @@
 3,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack1_third_Seq_Montage.Attack1_third_Seq_Montage',2,FALSE
 4,Equip,/Script/Engine.AnimMontage'/Game/Montages/Sword/Equip_Sword_Montage.Equip_Sword_Montage',1,TRUE
 5,Unequip,/Script/Engine.AnimMontage'/Game/Montages/Sword/Equip_Sword_Montage.Equip_Sword_Montage',1,TRUE
+6,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Upper_Swing_Montage.Upper_Swing_Montage',2,FALSE

@@ -110,7 +110,8 @@ void ACEnemy_AI::Dead()
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Wait);
 	bDead = true;
-	GroupManager->RemoveEnemy(this);
+	if(!!GroupManager)
+		GroupManager->RemoveEnemy(this);
 	Super::Dead();
 
 }
@@ -136,6 +137,13 @@ void ACEnemy_AI::OnSword()
 	CheckNull(Sword);
 
 	Sword->OnEquip();
+}
+
+void ACEnemy_AI::UpperAction()
+{
+	CheckNull(Sword);
+
+	Sword->DoAction(ESwordAttackType::UpperAttack);
 }
 
 bool ACEnemy_AI::IsEquipped()
