@@ -1,7 +1,10 @@
-,Type,Montage,PlayRate,bCanMove
-1,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Sword_Attack_1_Montage.Sword_Attack_1_Montage',2,FALSE
-2,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack1_Second_Seq_Montage.Attack1_Second_Seq_Montage',2,FALSE
-3,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack1_third_Seq_Montage.Attack1_third_Seq_Montage',2,FALSE
-4,Equip,/Script/Engine.AnimMontage'/Game/Montages/Sword/Equip_Sword_Montage.Equip_Sword_Montage',1,TRUE
-5,Unequip,/Script/Engine.AnimMontage'/Game/Montages/Sword/Equip_Sword_Montage.Equip_Sword_Montage',1,TRUE
-6,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Upper_Swing_Montage.Upper_Swing_Montage',2,FALSE
+,Type,Montage,PlayRate,bCanMove,bFixedCamera
+1,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Sword_Attack_1_Montage.Sword_Attack_1_Montage',2,FALSE,FALSE
+2,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack1_Second_Seq_Montage.Attack1_Second_Seq_Montage',2,FALSE,FALSE
+3,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack1_third_Seq_Montage.Attack1_third_Seq_Montage',2,FALSE,FALSE
+4,Equip,/Script/Engine.AnimMontage'/Game/Montages/Sword/Equip_Sword_Montage.Equip_Sword_Montage',1,TRUE,FALSE
+5,Unequip,/Script/Engine.AnimMontage'/Game/Montages/Sword/Equip_Sword_Montage.Equip_Sword_Montage',1,TRUE,FALSE
+6,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Upper_Swing_Montage.Upper_Swing_Montage',2,FALSE,TRUE
+7,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack_First_Air_Montage.Attack_First_Air_Montage',2,FALSE,TRUE
+8,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack_Second_Air_Montage.Attack_Second_Air_Montage',2,FALSE,TRUE
+9,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack_Third_Air_Montage.Attack_Third_Air_Montage',2,FALSE,TRUE

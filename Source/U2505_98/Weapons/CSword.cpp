@@ -162,6 +162,11 @@ void ACSword::DoAction(ESwordAttackType InType)
 	bAttacking = true;
 	Index = static_cast<uint8>(InType);
 	ActionDatas[Index].PlayMontage(OwnerCharacter);
+
+	ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+	CheckNull(OwnerCharacter);
+	if (ActionDatas[Index].bFixedCamera)
+		player->OnFixedCamera();
 }
 
 void ACSword::Begin_DoAction()
@@ -174,6 +179,11 @@ void ACSword::Begin_DoAction()
 
 void ACSword::End_DoAction()
 {
+	ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+	if(!!player)
+		if (ActionDatas[Index].bFixedCamera)
+			player->OffFixedCamera();
+
 	bAttacking = false;
 	Index = static_cast<uint8>(ESwordAttackType::BasicAttack_First);
 	bEnable = false;
@@ -210,6 +220,35 @@ void ACSword::Begin_Collision()
 void ACSword::End_Collision()
 {
 	Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if (ActionDatas[Index].bFixedCamera == false)
+	{
+		Hitted.Empty();
+
+		return;
+	}
+
+	float angle = FLT_MIN;
+
+	FVector location = OwnerCharacter->GetActorLocation();
+
+	for (IIDamagable* idamage : Hitted)
+	{
+		ACharacter* character = Cast<ACharacter>(idamage);
+		if (character == nullptr)
+			continue;
+		FVector direction = character->GetActorLocation() - location;
+		direction = direction.GetUnsafeNormal2D();
+
+		FVector forward = OwnerCharacter->GetActorForwardVector();
+		float dot = FVector::DotProduct(direction, forward);
+
+		if (dot < HittedAngle || dot < angle)
+			continue;
+
+		angle = dot;
+		Candidate = character;
+	}
 
 	Hitted.Empty();
 }
@@ -309,6 +348,36 @@ void ACSword::BeginPlay()
    End_Collision();
 
    Capsule->OnComponentBeginOverlap.AddDynamic(this, &ACSword::OnBeginOverlap);
+}
+
+void ACSword::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	CheckNull(Candidate);
+
+	APlayerController* controller = OwnerCharacter->GetController<APlayerController>();
+	CheckNull(controller);
+
+
+	FRotator ownerToTarget = UKismetMathLibrary::FindLookAtRotation(OwnerCharacter->GetActorLocation(), Candidate->GetActorLocation());
+	FRotator controlRotation = OwnerCharacter->GetControlRotation();
+
+	ownerToTarget.Pitch = controlRotation.Pitch;
+
+	if (controlRotation.Equals(ownerToTarget, FinishHittedAngle))
+	{
+		Candidate = nullptr;
+		controller->SetControlRotation(ownerToTarget);
+
+		return;
+	}
+
+
+	ownerToTarget.Roll = controlRotation.Roll;
+	FRotator result = UKismetMathLibrary::RInterpTo(controlRotation, ownerToTarget, DeltaTime, RotationSpeed);
+
+	controller->SetControlRotation(result);
 }
 
 

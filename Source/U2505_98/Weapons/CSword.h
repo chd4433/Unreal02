@@ -25,6 +25,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	class UDataTable* DamagedDataTable;
 
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Hitted")
+	float HittedAngle = 0.75f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hitted")
+	float FinishHittedAngle = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hitted")
+	float RotationSpeed = 50.0f;
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -77,6 +86,9 @@ private:
 
 protected:
 	virtual void BeginPlay() override;
+	
+public:
+	virtual void Tick(float DeltaTime) override;
 
 private:
 	class ACharacter* OwnerCharacter;
@@ -104,6 +116,7 @@ private:
 
 private:
 	TArray<class IIDamagable*> Hitted;
+	class ACharacter* Candidate;
 
 private:
 	TArray<class ACShield*> Shields;

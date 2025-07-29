@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bCanMove;
 
+	UPROPERTY(EditAnywhere)
+	bool bFixedCamera;
+
 public:
 	void PlayMontage(class ACharacter* InCharacter);
 };

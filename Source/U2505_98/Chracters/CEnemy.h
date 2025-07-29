@@ -7,6 +7,7 @@
 #include "IHittedReaction.h"
 #include "CEnemy.generated.h"
 
+
 UCLASS()
 class U2505_98_API ACEnemy 
 	: public ACharacter
@@ -51,6 +52,10 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UWidgetComponent* Widget;
 
+private:
+	UPROPERTY(VisibleAnywhere)
+	class UCapsuleComponent* UpperCapsule;
+	
 
 public:
 	ACEnemy();
@@ -84,7 +89,7 @@ public:
 public:
 	FORCEINLINE bool Air_Reaction() override { return bAirReaction; };
 	FORCEINLINE void SetAir_Reaction(bool Inbool) override { bAirReaction = Inbool; };
-
+	void SetChangeCollision(ECollisionType InType) override;
 
 private:
 	bool bAirReaction = false;

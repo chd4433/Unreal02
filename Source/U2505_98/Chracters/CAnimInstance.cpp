@@ -66,6 +66,7 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		if (bHit_Air)
 		{
 			hittedReaction->SetAir_Reaction(OwnerCharacter->GetCharacterMovement()->IsFalling());
+			hittedReaction->SetChangeCollision(ECollisionType::Ground);
 		}
 	}
 }

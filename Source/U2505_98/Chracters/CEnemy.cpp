@@ -70,6 +70,15 @@ ACEnemy::ACEnemy()
 
 	FHelpers::GetClass<UCUserWidget_Enemy>(&UI_EnemyClass, "/Script/UMGEditor.WidgetBlueprint'/Game/Widgets/WB_Enemy.WB_Enemy_C'");
 	Widget->SetWidgetClass(UI_EnemyClass);	
+
+	//UpperCapsule
+	FHelpers::CreateComponent<UCapsuleComponent>(this, &UpperCapsule, "UpperCapsule", GetCapsuleComponent());
+
+	UpperCapsule->SetRelativeLocation(FVector(0.0f, 0.0f, -40.0f));
+	UpperCapsule->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
+	UpperCapsule->SetCapsuleHalfHeight(88.0f);
+	UpperCapsule->SetCapsuleRadius(34.0f);
+	UpperCapsule->SetCollisionProfileName("NoCollision");
 }
 
 void ACEnemy::BeginPlay()
@@ -132,62 +141,6 @@ void ACEnemy::Tick(float DeltaTime)
 
 	FRotator rotator = UKismetMathLibrary::FindLookAtRotation(transform.GetLocation(), cameraLocation);
 	Widget->SetWorldRotation(rotator);
-
-	//if (bAirReaction)
-	//{
-	//	if (PreviousAirType != CurrentType)
-	//	{
-	//		PlayHitReaction(CurrentType);
-	//		PreviousAirType = CurrentType;
-	//	}
-
-	//	switch (CurrentType)
-	//	{
-	//	case EAirSequnceDataType::Air_Begin:
-	//	{
-	//		float Position = GetMesh()->GetAnimInstance()->Montage_GetPosition(CurrentHitMontage);
-	//		float Length = CurrentHitMontage->GetPlayLength();
-	//		float Percent = (Length > 0.f) ? Position / Length : 0.f;
-
-	//		if (Percent >= 0.2f)
-	//		{
-	//			CurrentType = EAirSequnceDataType::Air_Loop;
-	//		}
-	//		break;
-	//	}
-
-	//	case EAirSequnceDataType::Air_Loop:
-	//	{
-	//		if (!GetCharacterMovement()->IsFalling())
-	//		{
-	//			CurrentType = EAirSequnceDataType::Air_End;
-	//		}
-	//		break;
-	//	}
-
-	//	case EAirSequnceDataType::Air_End:
-	//	{
-	//		float Position = GetMesh()->GetAnimInstance()->Montage_GetPosition(CurrentHitMontage);
-	//		float Length = CurrentHitMontage->GetPlayLength();
-	//		float Percent = (Length > 0.f) ? Position / Length : 0.f;
-
-
-	//		if (Percent >= 0.3f)
-	//		{
-	//			CurrentType = EAirSequnceDataType::Air_Begin;
-	//			PreviousAirType = EAirSequnceDataType::Max;
-	//			bAirReaction = false;
-
-	//			// 필요 시 몽타주 정지
-	//			GetMesh()->GetAnimInstance()->Montage_Stop(0.2f);
-	//		}
-	//		break;
-	//	}
-
-	//	default:
-	//		break;
-	//	}
-	//}
 
 }
 
@@ -252,6 +205,8 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 			uppderDirection.X = launchDistance.X;
 			uppderDirection.Y = launchDistance.Y;
 			LaunchCharacter(uppderDirection, false, false);
+
+			SetChangeCollision(ECollisionType::Air);
 		}
 		else
 			LaunchCharacter(launchDistance, false, false);
@@ -301,5 +256,22 @@ void ACEnemy::Dead()
 void ACEnemy::End_Dead()
 {
 	Destroy();
+}
+
+void ACEnemy::SetChangeCollision(ECollisionType InType)
+{
+	switch (InType)
+	{
+	case ECollisionType::Ground:
+		UpperCapsule->SetCollisionProfileName("NoCollision");
+		GetCapsuleComponent()->SetCollisionProfileName("Pawn");
+		break;
+	case ECollisionType::Air:
+		UpperCapsule->SetCollisionProfileName("OverlapAllDynamic");
+		GetCapsuleComponent()->SetCollisionProfileName("NoCollision");
+		break;
+	default:
+		break;
+	}
 }
 

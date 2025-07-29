@@ -72,6 +72,10 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	FORCEINLINE void OnFixedCamera() { bFixedCamera = true; }
+	FORCEINLINE void OffFixedCamera() { bFixedCamera = false; }
+
 private:
 	void OnMoveForward(float InValue);
 	void OnMoveRight(float InValue);
@@ -141,4 +145,5 @@ private:
 	float Health;
 	bool bCanMove;
 	bool bRotation;
+	bool bFixedCamera;
 };

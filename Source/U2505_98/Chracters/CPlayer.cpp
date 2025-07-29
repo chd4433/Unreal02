@@ -149,11 +149,15 @@ void ACPlayer::OnMoveRight(float InValue)
 
 void ACPlayer::OnHorizontalLook(float InValue)
 {
+	CheckTrue(bFixedCamera);
+
 	AddControllerYawInput(InValue);
 }
 
 void ACPlayer::OnVerticalLook(float InValue)
 {
+	CheckTrue(bFixedCamera);
+
 	AddControllerPitchInput(InValue);
 }
 
