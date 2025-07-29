@@ -7,6 +7,7 @@
 #include "Components/SkinnedMeshComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Animation/AnimMontage.h"
+#include "Engine/DataTable.h"
 
 #include "CAnimInstance.h"
 #include "CEnemy_AI.h"
@@ -68,8 +69,7 @@ ACEnemy::ACEnemy()
 	Widget->SetWidgetSpace(EWidgetSpace::World);
 
 	FHelpers::GetClass<UCUserWidget_Enemy>(&UI_EnemyClass, "/Script/UMGEditor.WidgetBlueprint'/Game/Widgets/WB_Enemy.WB_Enemy_C'");
-	Widget->SetWidgetClass(UI_EnemyClass);
-	
+	Widget->SetWidgetClass(UI_EnemyClass);	
 }
 
 void ACEnemy::BeginPlay()
@@ -87,10 +87,7 @@ void ACEnemy::BeginPlay()
 	UI_Enemy = Cast<UCUserWidget_Enemy>(Widget->GetUserWidgetObject());
 	UI_Enemy->UpdateHealth(Health, MaxHealth);
 	UI_Enemy->UpdateName(GetName());
-	FLog::Log(GetController());
-	//ac = GetController();
-	//UI_Enemy->UpdateControllerName(GetController()->GetName());
-	
+
 }
 
 void ACEnemy::OnConstruction(const FTransform& Transform)
@@ -135,6 +132,62 @@ void ACEnemy::Tick(float DeltaTime)
 
 	FRotator rotator = UKismetMathLibrary::FindLookAtRotation(transform.GetLocation(), cameraLocation);
 	Widget->SetWorldRotation(rotator);
+
+	//if (bAirReaction)
+	//{
+	//	if (PreviousAirType != CurrentType)
+	//	{
+	//		PlayHitReaction(CurrentType);
+	//		PreviousAirType = CurrentType;
+	//	}
+
+	//	switch (CurrentType)
+	//	{
+	//	case EAirSequnceDataType::Air_Begin:
+	//	{
+	//		float Position = GetMesh()->GetAnimInstance()->Montage_GetPosition(CurrentHitMontage);
+	//		float Length = CurrentHitMontage->GetPlayLength();
+	//		float Percent = (Length > 0.f) ? Position / Length : 0.f;
+
+	//		if (Percent >= 0.2f)
+	//		{
+	//			CurrentType = EAirSequnceDataType::Air_Loop;
+	//		}
+	//		break;
+	//	}
+
+	//	case EAirSequnceDataType::Air_Loop:
+	//	{
+	//		if (!GetCharacterMovement()->IsFalling())
+	//		{
+	//			CurrentType = EAirSequnceDataType::Air_End;
+	//		}
+	//		break;
+	//	}
+
+	//	case EAirSequnceDataType::Air_End:
+	//	{
+	//		float Position = GetMesh()->GetAnimInstance()->Montage_GetPosition(CurrentHitMontage);
+	//		float Length = CurrentHitMontage->GetPlayLength();
+	//		float Percent = (Length > 0.f) ? Position / Length : 0.f;
+
+
+	//		if (Percent >= 0.3f)
+	//		{
+	//			CurrentType = EAirSequnceDataType::Air_Begin;
+	//			PreviousAirType = EAirSequnceDataType::Max;
+	//			bAirReaction = false;
+
+	//			// 필요 시 몽타주 정지
+	//			GetMesh()->GetAnimInstance()->Montage_Stop(0.2f);
+	//		}
+	//		break;
+	//	}
+
+	//	default:
+	//		break;
+	//	}
+	//}
 
 }
 
@@ -189,8 +242,21 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 	FVector direction = target - start;
 	direction.Normalize();
 
-	if (data->Launch > 0.0f)
-		LaunchCharacter(-direction * data->Launch, false, false);
+	if (data->Launch > 0.0f || data->bUpper)
+	{
+		FVector launchDistance = -direction * data->Launch;		
+		if (data->bUpper)
+		{
+			bAirReaction = data->bUpper;
+			FVector uppderDirection = FVector(0.0f, 0.0f, 1.0f) * data->UpperLaunch;
+			uppderDirection.X = launchDistance.X;
+			uppderDirection.Y = launchDistance.Y;
+			LaunchCharacter(uppderDirection, false, false);
+		}
+		else
+			LaunchCharacter(launchDistance, false, false);
+
+	}
 
 	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
 
@@ -215,11 +281,7 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 	}
 		
 		
-	if (data->bUpper)
-	{
-		FVector uppderDirection = FVector(0.0f, 0.0f, 1.0f);
-		LaunchCharacter(uppderDirection * data->UpperLaunch, false, false);
-	}
+	
 
 }
 
@@ -240,3 +302,4 @@ void ACEnemy::End_Dead()
 {
 	Destroy();
 }
+

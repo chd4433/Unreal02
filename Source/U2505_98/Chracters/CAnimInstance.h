@@ -24,6 +24,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
 	float Direction;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
+	bool bHit_Air;
+
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
 	bool bEquip_Sword;

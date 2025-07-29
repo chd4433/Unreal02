@@ -1,0 +1,2 @@
+#include "Chracters/IHittedReaction.h"
+

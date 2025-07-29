@@ -4,12 +4,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Weapons/IDamagable.h"
+#include "IHittedReaction.h"
 #include "CEnemy.generated.h"
 
 UCLASS()
 class U2505_98_API ACEnemy 
 	: public ACharacter
 	, public IIDamagable
+	, public IIHittedReaction
 {
 	GENERATED_BODY()
 
@@ -79,6 +81,15 @@ protected:
 public:
 	virtual void End_Dead();
 
+public:
+	FORCEINLINE bool Air_Reaction() override { return bAirReaction; };
+	FORCEINLINE void SetAir_Reaction(bool Inbool) override { bAirReaction = Inbool; };
+
+
+private:
+	bool bAirReaction = false;
+
+
 private:
 	TArray<class UMaterialInstanceDynamic*> Materials;
 
@@ -87,5 +98,4 @@ private:
 
 private:
 	class UCUserWidget_Enemy* UI_Enemy;
-	//class AController* ac;
 };

@@ -201,7 +201,6 @@ void ACSword::End_Combo()
 
 void ACSword::Begin_Collision()
 {
-	FLog::Log("Begin_Empty");
 	Hitted.Empty();
 
 	Capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -210,8 +209,6 @@ void ACSword::Begin_Collision()
 
 void ACSword::End_Collision()
 {
-	FLog::Log("End_Empty");
-
 	Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	Hitted.Empty();
@@ -252,13 +249,8 @@ void ACSword::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 	ACharacter* attacker = Cast<ACharacter>(GetOwner());
 	UShapeComponent* collision = Cast<UShapeComponent>(OverlappedComponent);
 	ACharacter* ohterCharacter = Cast<ACharacter>(OtherActor);
-	int b = 0;
-	for (auto a : Hitted)
-	{
-		FLog::Log(b);
-		FLog::Log(Cast<ACharacter>(a)->GetName());
-		b++;
-	}
+	
+
 
 	DamagedDatas[Index].SendDamage(attacker, this, collision, ohterCharacter, Hitted.Num() <= 1);
 }

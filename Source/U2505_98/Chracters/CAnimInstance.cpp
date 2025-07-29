@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Weapons/ISword.h"
 #include "Weapons/IShield.h"
+#include "IHittedReaction.h"
 
 void UCAnimInstance::NativeBeginPlay()
 {
@@ -58,6 +59,13 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 		
-
-
+	IIHittedReaction* hittedReaction = Cast<IIHittedReaction>(OwnerCharacter);
+	if (!!hittedReaction)
+	{
+		bHit_Air = hittedReaction->Air_Reaction();
+		if (bHit_Air)
+		{
+			hittedReaction->SetAir_Reaction(OwnerCharacter->GetCharacterMovement()->IsFalling());
+		}
+	}
 }
