@@ -139,12 +139,6 @@ void ACEnemy_AI::OnSword()
 	Sword->OnEquip();
 }
 
-void ACEnemy_AI::UpperAction()
-{
-	CheckNull(Sword);
-
-	Sword->DoAction(ESwordAttackType::UpperAttack);
-}
 
 bool ACEnemy_AI::IsEquipped()
 {

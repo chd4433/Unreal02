@@ -76,6 +76,9 @@ public:
 	FORCEINLINE void OnFixedCamera() { bFixedCamera = true; }
 	FORCEINLINE void OffFixedCamera() { bFixedCamera = false; }
 
+	FORCEINLINE void SetAttackJump(bool InJump) { bAttackJump = InJump; };
+	FORCEINLINE bool GetAttackJump() { return bAttackJump; };
+
 private:
 	void OnMoveForward(float InValue);
 	void OnMoveRight(float InValue);
@@ -85,6 +88,9 @@ private:
 private:
 	void OnRun();
 	void OffRun();
+
+private:
+	void RightClick();
 
 public:
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -106,7 +112,8 @@ public:
 private:
 	void OnSword() override;
 	void OnDoAction() override;
-	void UpperAction() override;
+	void UpperAttack();
+	void DownAttack();
 
 public:
 	bool IsEquipped() override;
@@ -146,4 +153,5 @@ private:
 	bool bCanMove;
 	bool bRotation;
 	bool bFixedCamera;
+	bool bAttackJump;
 };

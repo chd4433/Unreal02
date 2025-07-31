@@ -80,6 +80,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	float UpperLaunch;
 
+	UPROPERTY(EditAnywhere)
+	bool bGravity;
+
+	UPROPERTY(EditAnywhere)
+	bool bHittedDownAttack;
+
 public:
 	void SendDamage(class ACharacter* InAttacker, class AActor* InAttackCauser, class UShapeComponent* InAttackCollision, class ACharacter* InOther, bool bFirstHit);
 
@@ -98,6 +104,35 @@ public:
 	bool bFirstHit;
 	class UShapeComponent* Collision;
 	FDamagedData* DamagedData;
+};
+
+USTRUCT()
+struct FAttachmentTrailData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere)
+	FName DustSocket;
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* DustEffect;
+
+public:
+	UPROPERTY(EditAnywhere)
+	FName StartSocket;
+
+	UPROPERTY(EditAnywhere)
+	FName EndSocket;
+
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<enum ETrailWidthMode> WidthScaleMode;
+
+	UPROPERTY(EditAnywhere)
+	float Width = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* TrailEffect;
 };
 
 UCLASS()

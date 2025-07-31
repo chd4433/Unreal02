@@ -27,6 +27,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
 	bool bHit_Air;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
+	bool bPlayerAttackJump;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
+	bool bPlayer;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
+	bool bDownAttack;
+
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Settings")
 	bool bEquip_Sword;
@@ -47,6 +56,7 @@ public:
 
 private:
 	class ACharacter* OwnerCharacter;
+	
 
 private:
 	float BlendSpeed = 1.0f / 0.1f;

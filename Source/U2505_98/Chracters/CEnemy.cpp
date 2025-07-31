@@ -235,13 +235,19 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 		data->PlayEffect(this, GetActorLocation());
 	}
 		
-		
-	
+	if (data->bHittedDownAttack)
+	{
+		bHittedDownAttack = true;
+		FVector DownLunch = FVector(0.0f, 0.0f, -1.0f) * DOWNATTACK_LAUNCH;
+		LaunchCharacter(DownLunch, false, false);
+		InAttacker->LaunchCharacter(DownLunch, false, false);
+	}
 
 }
 
 void ACEnemy::End_Damaged()
 {
+	bHittedDownAttack = false;
 }
 
 void ACEnemy::Dead()

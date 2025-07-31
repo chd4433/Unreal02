@@ -164,7 +164,23 @@ void ACSword::DoAction(ESwordAttackType InType)
 	ActionDatas[Index].PlayMontage(OwnerCharacter);
 
 	ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
-	CheckNull(OwnerCharacter);
+	CheckNull(player);
+	if (ActionDatas[Index].bFixedCamera)
+		player->OnFixedCamera();
+}
+
+void ACSword::ForceDoAction(ESwordAttackType InType)
+{
+	CheckFalse(bEquipped);
+	CheckTrue(bEquipping);
+	//CheckTrue(bAttacking);
+
+	bAttacking = true;
+	Index = static_cast<uint8>(InType);
+	ActionDatas[Index].PlayMontage(OwnerCharacter);
+
+	ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+	CheckNull(player);
 	if (ActionDatas[Index].bFixedCamera)
 		player->OnFixedCamera();
 }
@@ -173,16 +189,42 @@ void ACSword::Begin_DoAction()
 {
 	CheckFalse(bExist);
 	bExist = false;
+	++Index;
+	if (Index > static_cast<uint8>(ESwordAttackType::UpperAttack))
+	{
+		ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+		CheckNull(player);
+		CheckFalse(player->GetAttackJump());
+	}
 
-	ActionDatas[++Index].PlayMontage(OwnerCharacter);
+	ActionDatas[Index].PlayMontage(OwnerCharacter);
 }
 
 void ACSword::End_DoAction()
 {
 	ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
-	if(!!player)
+	if (!!player)
+	{
 		if (ActionDatas[Index].bFixedCamera)
 			player->OffFixedCamera();
+		player->SetAttackJump(false);
+	}
+		
+
+	if (DamagedDatas[Index].bGravity)
+	{
+		if (!!player)
+		{
+			player->GetCharacterMovement()->GravityScale = 1.0f;
+		}
+		for (IIDamagable* idamage : GravityHitted)
+		{
+			ACharacter* enemy = Cast<ACharacter>(idamage);
+			enemy->GetCharacterMovement()->GravityScale = 1.0f;
+		}
+	}
+	GravityHitted.Empty();
+
 
 	bAttacking = false;
 	Index = static_cast<uint8>(ESwordAttackType::BasicAttack_First);
@@ -292,6 +334,31 @@ void ACSword::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 
 	DamagedDatas[Index].SendDamage(attacker, this, collision, ohterCharacter, Hitted.Num() <= 1);
+
+	if (DamagedDatas[Index].bGravity)
+	{
+		ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+		CheckNull(player);
+		ACharacter* enemy = Cast<ACharacter>(OtherActor);
+		GravityHitted.AddUnique(other);
+		player->GetCharacterMovement()->GravityScale = 0.0f;
+		player->GetCharacterMovement()->StopMovementImmediately();
+		enemy->GetCharacterMovement()->GravityScale = 0.0f;
+		enemy->GetCharacterMovement()->StopMovementImmediately();
+	}
+
+	if (Index == static_cast<uint8>(ESwordAttackType::UpperAttack))
+	{
+		ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+		CheckNull(player);
+		FVector uppderDirection = FVector(0.0f, 0.0f, 1.0f) * DamagedDatas[Index].UpperLaunch;
+		CheckTrue(player->GetAttackJump())
+		player->LaunchCharacter(uppderDirection, false, false);
+
+		player->SetAttackJump(true);
+	}
+	
+	
 }
 
 void ACSword::BeginPlay()

@@ -20,7 +20,6 @@ class U2505_98_API IISword
 
 public:
 	virtual void OnSword() = 0;
-	virtual void UpperAction() = 0;
 
 public:
 	virtual bool IsEquipped() = 0;

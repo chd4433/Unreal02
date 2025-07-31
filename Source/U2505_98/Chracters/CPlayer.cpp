@@ -123,9 +123,9 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("Sword", EInputEvent::IE_Pressed, this, &ACPlayer::OnSword);
 	PlayerInputComponent->BindAction("Action", EInputEvent::IE_Pressed, this, &ACPlayer::OnDoAction);
-	PlayerInputComponent->BindAction("UpperAttack", EInputEvent::IE_Pressed, this, &ACPlayer::UpperAction);
+	PlayerInputComponent->BindAction("UpperAttack", EInputEvent::IE_Pressed, this, &ACPlayer::UpperAttack);
 
-	PlayerInputComponent->BindAction("Shield", EInputEvent::IE_Pressed, this, &ACPlayer::Begin_shielded);
+	PlayerInputComponent->BindAction("Shield", EInputEvent::IE_Pressed, this, &ACPlayer::RightClick);
 	PlayerInputComponent->BindAction("Shield", EInputEvent::IE_Released, this, &ACPlayer::End_shielded);
 }
 
@@ -170,6 +170,14 @@ void ACPlayer::OnRun()
 void ACPlayer::OffRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+}
+
+void ACPlayer::RightClick()
+{
+	if (bAttackJump)
+		DownAttack();
+	else
+		Begin_shielded();
 }
 
 float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -330,11 +338,18 @@ void ACPlayer::OnDoAction()
 	Sword->DoAction();
 }
 
-void ACPlayer::UpperAction()
+void ACPlayer::UpperAttack()
 {
 	CheckNull(Sword);
 
-	Sword->DoAction(ESwordAttackType::UpperAttack);
+	Sword->ForceDoAction(ESwordAttackType::UpperAttack);
+}
+
+void ACPlayer::DownAttack()
+{
+	CheckNull(Sword);
+
+	Sword->ForceDoAction(ESwordAttackType::Air_DownAttack);
 }
 
 void ACPlayer::Begin_DoAction()

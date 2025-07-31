@@ -66,7 +66,6 @@ public:
 	void End_Dead()override;
 public:
 	void OnSword() override;
-	void UpperAction()override;
 
 public:
 	bool IsEquipped() override;

@@ -8,6 +8,7 @@
 #include "Weapons/ISword.h"
 #include "Weapons/IShield.h"
 #include "IHittedReaction.h"
+#include "Chracters/CPlayer.h"
 
 void UCAnimInstance::NativeBeginPlay()
 {
@@ -17,6 +18,10 @@ void UCAnimInstance::NativeBeginPlay()
 	CheckNull(OwnerCharacter);
 
 	ShieldAnimationBlendWeight = 0.0f;
+
+	ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+	if (!!player)
+		bPlayer = true;
 }
 
 void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -63,10 +68,17 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!!hittedReaction)
 	{
 		bHit_Air = hittedReaction->Air_Reaction();
+		bDownAttack = hittedReaction->GetHittedDownAttack();
 		if (bHit_Air)
 		{
 			hittedReaction->SetAir_Reaction(OwnerCharacter->GetCharacterMovement()->IsFalling());
 			hittedReaction->SetChangeCollision(ECollisionType::Ground);
 		}
+	}
+
+	ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
+	if (!!player)
+	{
+		bPlayerAttackJump = player->GetAttackJump();
 	}
 }

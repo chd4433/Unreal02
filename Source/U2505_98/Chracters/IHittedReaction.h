@@ -24,5 +24,6 @@ public:
 	virtual bool Air_Reaction() = 0;
 	virtual void SetAir_Reaction(bool Inbool) = 0;
 	virtual void SetChangeCollision(ECollisionType InType) = 0;
+	virtual bool GetHittedDownAttack() = 0;
 
 };

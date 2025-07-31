@@ -8,7 +8,7 @@
 
 enum class ESwordAttackType : uint8
 {
-	BasicAttack_First = 0, BasicAttack_Second, BasicAttack_Third,UpperAttack, UpperCombo_First, UpperCombo_Second, UpperCombo_Third, Max,
+	BasicAttack_First = 0, BasicAttack_Second, BasicAttack_Third, UpperCombo_First, UpperCombo_Second, UpperCombo_Third, UpperAttack, Air_Attack_Combo1, Air_DownAttack, Max,
 };
 
 
@@ -69,6 +69,7 @@ public:
 
 public:
 	void DoAction(ESwordAttackType InType = ESwordAttackType::BasicAttack_First);
+	void ForceDoAction(ESwordAttackType InType = ESwordAttackType::BasicAttack_First);
 	void Begin_DoAction();
 	void End_DoAction();
 
@@ -116,6 +117,7 @@ private:
 
 private:
 	TArray<class IIDamagable*> Hitted;
+	TArray<class IIDamagable*> GravityHitted;
 	class ACharacter* Candidate;
 
 private:

@@ -7,3 +7,5 @@
 
 #include "Utilities/FHelpers.h"
 #include "Utilities/FLog.h"
+
+#define DOWNATTACK_LAUNCH 1000.0f

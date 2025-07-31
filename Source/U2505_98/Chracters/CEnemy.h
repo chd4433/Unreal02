@@ -90,10 +90,11 @@ public:
 	FORCEINLINE bool Air_Reaction() override { return bAirReaction; };
 	FORCEINLINE void SetAir_Reaction(bool Inbool) override { bAirReaction = Inbool; };
 	void SetChangeCollision(ECollisionType InType) override;
+	FORCEINLINE bool GetHittedDownAttack() override { return bHittedDownAttack; };
 
 private:
 	bool bAirReaction = false;
-
+	bool bHittedDownAttack;
 
 private:
 	TArray<class UMaterialInstanceDynamic*> Materials;
