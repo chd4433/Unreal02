@@ -30,7 +30,16 @@ private:
 	class UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere)
+	class USpringArmComponent* ExecutionSpringArm;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCameraComponent* ExecutionCamera;
+
+	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* Sworldsheath;
+
+	UPROPERTY(VisibleAnywhere)
+	class UMotionWarpingComponent* MotionWarping;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
@@ -52,8 +61,22 @@ private:
 	float DeadMontage_PlayRate = 1.0f;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	class UAnimMontage* ExecutionMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	float ExecutionMontage_PlayRate = 1.0f;
+
+private:
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float MaxHealth = 100;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	bool bDebug;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	float TraceDistance = 100;
 
 public:
 	FORCEINLINE void SetbRotation(bool InRotation) {  bRotation = InRotation; }
@@ -92,6 +115,13 @@ private:
 private:
 	void RightClick();
 
+private:
+	void LineTrace();
+	void Execution();
+
+public:
+	void EndExecution();
+
 public:
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -106,8 +136,6 @@ private:
 
 public:
 	void End_Dead();
-
-
 
 private:
 	void OnSword() override;
@@ -154,4 +182,7 @@ private:
 	bool bRotation;
 	bool bFixedCamera;
 	bool bAttackJump;
+
+private:
+	class ACEnemy* ExecutionEnemy;
 };

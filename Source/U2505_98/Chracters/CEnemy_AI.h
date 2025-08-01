@@ -88,6 +88,8 @@ public:
 
 	void Destroy_Sword() override;
 
+public:
+	void Damaged_State();
 private:
 	class ACSword* Sword;
 

@@ -238,3 +238,10 @@ void ACEnemy_AI::Destroy_Sword()
 	Sword->Destroy_Sword();
 	Sword = nullptr;
 }
+
+void ACEnemy_AI::Damaged_State()
+{
+	ACAIController* controller = GetController<ACAIController>();
+	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
+	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Damaged);
+}

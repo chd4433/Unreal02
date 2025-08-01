@@ -64,6 +64,8 @@ ACEnemy::ACEnemy()
 
 	FHelpers::GetAsset<UAnimMontage>(&DeadMontage, "/Script/Engine.AnimMontage'/Game/Montages/Deaths_Hit_Dazed_Montage.Deaths_Hit_Dazed_Montage'");
 
+	FHelpers::GetAsset<UAnimMontage>(&ExecutionDenfenderMontage, "/Script/Engine.AnimMontage'/Game/Montages/Execution/ExecutionMotion_Defender_Montage.ExecutionMotion_Defender_Montage'");
+
 	FHelpers::CreateComponent<UWidgetComponent>(this, &Widget, "Widget", GetCapsuleComponent());
 	Widget->SetRelativeLocation(FVector(0, 0, 110));
 	Widget->SetWidgetSpace(EWidgetSpace::World);
@@ -262,6 +264,11 @@ void ACEnemy::Dead()
 void ACEnemy::End_Dead()
 {
 	Destroy();
+}
+
+void ACEnemy::ExecutionDefender()
+{
+	PlayAnimMontage(ExecutionDenfenderMontage, ExecutionDenfenderMontage_PlayRate);
 }
 
 void ACEnemy::SetChangeCollision(ECollisionType InType)

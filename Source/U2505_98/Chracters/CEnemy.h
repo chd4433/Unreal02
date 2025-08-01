@@ -44,6 +44,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Montage")
 	float DeadMontage_PlayRate = 1.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	class UAnimMontage* ExecutionDenfenderMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	float ExecutionDenfenderMontage_PlayRate = 1.0f;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Widget")
 	TSubclassOf<class UCUserWidget_Enemy> UI_EnemyClass;
@@ -87,6 +93,11 @@ public:
 	virtual void End_Dead();
 
 public:
+	void ExecutionDefender();
+
+public:
+	FORCEINLINE const float GetHealth() {return Health;}
+
 	FORCEINLINE bool Air_Reaction() override { return bAirReaction; };
 	FORCEINLINE void SetAir_Reaction(bool Inbool) override { bAirReaction = Inbool; };
 	void SetChangeCollision(ECollisionType InType) override;

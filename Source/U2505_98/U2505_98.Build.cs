@@ -16,6 +16,7 @@ public class U2505_98 : ModuleRules
         PublicDependencyModuleNames.Add("InputCore");
         PublicDependencyModuleNames.Add("AIModule");
         PublicDependencyModuleNames.Add("NavigationSystem");
+        PublicDependencyModuleNames.Add("MotionWarping");
 
     }
 }

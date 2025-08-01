@@ -12,7 +12,8 @@
 				"Engine",
 				"CoreUObject",
 				"UMG",
-				"AIModule"
+				"AIModule",
+				"MotionWarping"
 			]
 		}
 	],
@@ -23,6 +24,10 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "MotionWarping",
+			"Enabled": true
 		}
 	]
 }
