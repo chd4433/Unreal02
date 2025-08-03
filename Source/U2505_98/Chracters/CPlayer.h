@@ -102,6 +102,8 @@ public:
 	FORCEINLINE void SetAttackJump(bool InJump) { bAttackJump = InJump; };
 	FORCEINLINE bool GetAttackJump() { return bAttackJump; };
 
+	FORCEINLINE void SetJump(bool InJump) { bJump = InJump; };
+
 private:
 	void OnMoveForward(float InValue);
 	void OnMoveRight(float InValue);
@@ -111,6 +113,7 @@ private:
 private:
 	void OnRun();
 	void OffRun();
+	void Jumping();
 
 private:
 	void RightClick();
@@ -142,6 +145,7 @@ private:
 	void OnDoAction() override;
 	void UpperAttack();
 	void DownAttack();
+	void JumpAttack();
 
 public:
 	bool IsEquipped() override;
@@ -182,6 +186,7 @@ private:
 	bool bRotation;
 	bool bFixedCamera;
 	bool bAttackJump;
+	bool bJump;
 
 private:
 	class ACEnemy* ExecutionEnemy;

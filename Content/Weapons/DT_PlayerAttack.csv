@@ -10,3 +10,4 @@
 9,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Upper_Swing_Montage.Upper_Swing_Montage',2,FALSE,TRUE
 10,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Air_Combo01_Z0_Montage.Air_Combo01_Z0_Montage',2,FALSE,TRUE
 11,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Air_Down_Attack_Z0_Montage.Air_Down_Attack_Z0_Montage',2,FALSE,TRUE
+12,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Air_JumpSpin_Attack_Z0_Montage.Air_JumpSpin_Attack_Z0_Montage',2,FALSE,FALSE

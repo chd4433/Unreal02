@@ -140,6 +140,17 @@ void ACPlayer::Tick(float DeltaTime)
 
 	}
 
+	if (bJump)
+	{
+		bJump = GetCharacterMovement()->IsFalling();
+		if (bJump == false)
+		{
+			StopAnimMontage();
+			CheckNull(Sword);
+			Sword->End_DoAction();
+		}
+	}
+
 }
 
 void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -153,6 +164,7 @@ void ACPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Pressed, this, &ACPlayer::OnRun);
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Released, this, &ACPlayer::OffRun);
+	PlayerInputComponent->BindAction("Jumping", EInputEvent::IE_Released, this, &ACPlayer::Jumping);
 
 	PlayerInputComponent->BindAction("Sword", EInputEvent::IE_Pressed, this, &ACPlayer::OnSword);
 	PlayerInputComponent->BindAction("Action", EInputEvent::IE_Pressed, this, &ACPlayer::OnDoAction);
@@ -205,6 +217,13 @@ void ACPlayer::OffRun()
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
 }
 
+void ACPlayer::Jumping()
+{
+	CheckFalse(bCanMove);
+	Jump();
+	bJump = true;
+}
+
 void ACPlayer::RightClick()
 {
 	if (bAttackJump)
@@ -234,8 +253,7 @@ void ACPlayer::LineTrace()
 	FHitResult hitResult;
 	UKismetSystemLibrary::LineTraceSingle(GetWorld(), start, end, traceType, false, ignores, type, hitResult, true, FLinearColor::Red, FColor::White);
 
-	//찾는 조건 
-	FLog::Log(hitResult.GetActor());
+
 	ACEnemy* enemy = Cast<ACEnemy>(hitResult.GetActor());
 	if (!!enemy)
 	{
@@ -321,7 +339,6 @@ float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 		}
 	}
 
-	FLog::Print(damage);
 	Health -= damage;
 	Health = FMath::Clamp<float>(Health, 0, MaxHealth);
 	UI_Player->UpdateHealth(Health, MaxHealth);
@@ -448,14 +465,21 @@ void ACPlayer::End_Equip()
 void ACPlayer::OnDoAction()
 {
 	CheckNull(Sword);
-	LineTrace();
-	if (!!ExecutionEnemy)
-	{
-		Execution();
-		ExecutionEnemy = nullptr;
-	}
+	if (bJump)
+		JumpAttack();
 	else
-		Sword->DoAction();
+	{
+		LineTrace();
+		if (!!ExecutionEnemy)
+		{
+			Execution();
+			ExecutionEnemy = nullptr;
+		}
+		else
+			Sword->DoAction();
+	}
+
+	
 }
 
 void ACPlayer::UpperAttack()
@@ -470,6 +494,13 @@ void ACPlayer::DownAttack()
 	CheckNull(Sword);
 
 	Sword->ForceDoAction(ESwordAttackType::Air_DownAttack);
+}
+
+void ACPlayer::JumpAttack()
+{
+	CheckNull(Sword);
+
+	Sword->DoAction(ESwordAttackType::Jump_Attack);
 }
 
 void ACPlayer::Begin_DoAction()

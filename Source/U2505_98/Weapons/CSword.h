@@ -8,7 +8,7 @@
 
 enum class ESwordAttackType : uint8
 {
-	BasicAttack_First = 0, BasicAttack_Second, BasicAttack_Third, UpperCombo_First, UpperCombo_Second, UpperCombo_Third, UpperAttack, Air_Attack_Combo1, Air_DownAttack, Max,
+	BasicAttack_First = 0, BasicAttack_Second, BasicAttack_Third, UpperCombo_First, UpperCombo_Second, UpperCombo_Third, UpperAttack, Air_Attack_Combo1, Air_DownAttack, Jump_Attack, Max,
 };
 
 

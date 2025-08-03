@@ -195,6 +195,7 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 	FVector start = GetActorLocation();
 	FVector target = InAttacker->GetActorLocation();
 	FVector direction = target - start;
+	direction.Z = 0;
 	direction.Normalize();
 
 	if (data->Launch > 0.0f || data->bUpper)
@@ -213,9 +214,17 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 		else
 			LaunchCharacter(launchDistance, false, false);
 
-	}
+		FLog::Log(launchDistance);
 
-	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
+	}
+	
+	FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(start, target);
+	LookAtRot.Pitch = 0.f;
+	LookAtRot.Roll = 0.f;
+
+	SetActorRotation(LookAtRot);
+
+	//SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
 
 
 	if (InEvent->bFirstHit)
