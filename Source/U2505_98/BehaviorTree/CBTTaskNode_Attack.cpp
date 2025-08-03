@@ -58,7 +58,10 @@ void UCBTTaskNode_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 	CheckNull(sword);
 
 	if (sword->IsAttacking() == false)
+	{
+		ai->SetActionState();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
 }
 
 EBTNodeResult::Type UCBTTaskNode_Attack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -75,6 +78,7 @@ EBTNodeResult::Type UCBTTaskNode_Attack::AbortTask(UBehaviorTreeComponent& Owner
 	IISword* sword = Cast<IISword>(ai);
 	CheckNullResult(sword, EBTNodeResult::Aborted);
 
+	ai->SetActionState();
 	sword->End_DoAction();
 
 	return EBTNodeResult::Aborted;

@@ -6,7 +6,10 @@
 #include "CAIController.h"
 #include "CAIStructures.h"
 #include "Weapons/CSword.h"
+#include "Weapons/CShield.h"
 #include "CAIGroup.h"
+#include "CPlayer.h"
+#include "Widgets/CUserWidget_Enemy.h"
 
 FGenericTeamId ACEnemy_AI::GetGenericTeamId() const
 {
@@ -23,6 +26,20 @@ void ACEnemy_AI::SetCountEnemy(ACEnemy_AI* InEnemy)
 	//blackboard->SetValueAsObject("Target", CountEnemy);
 }
 
+void ACEnemy_AI::SetPlayerTarget(ACPlayer* InPlayer)
+{
+	ACAIController* controller = GetController<ACAIController>();
+	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
+	blackboard->SetValueAsObject("GroupTarget", Cast<ACharacter>(InPlayer));
+}
+
+void ACEnemy_AI::SetWanderTarget(ACPlayer* InPlayer)
+{
+	ACAIController* controller = GetController<ACAIController>();
+	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
+	blackboard->SetValueAsObject("WanderTarget", Cast<ACharacter>(InPlayer));
+}
+
 void ACEnemy_AI::InitializeGroupFighting()
 {
 	bFinishGoToLocation = false;
@@ -35,9 +52,14 @@ ACEnemy_AI::ACEnemy_AI()
 
 	FHelpers::GetClass<ACSword>(&SwordClass, "/Script/Engine.Blueprint'/Game/Weapons/BP_CSword.BP_CSword_C'");
 
+	FHelpers::GetClass<ACShield>(&ShieldClass, "/Script/Engine.Blueprint'/Game/Weapons/BP_CShield.BP_CShield_C'");
+
+
 	FHelpers::GetClass<AController>(&AIControllerClass, "/Script/Engine.Blueprint'/Game/Enemy/BP_CAIController.BP_CAIController_C'");
 
 	FHelpers::GetAsset<UBehaviorTree>(&BehaviorTree, "/Script/AIModule.BehaviorTree'/Game/Enemy/BT_Enemy_AI.BT_Enemy_AI'");
+
+	FHelpers::GetAsset<UAnimMontage>(&ShieldMontage, "/Script/Engine.AnimMontage'/Game/Montages/Shield/Shield_Idle_Montage.Shield_Idle_Montage'");
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
@@ -55,6 +77,7 @@ void ACEnemy_AI::BeginPlay()
 	Sword = GetWorld()->SpawnActor<ACSword>(SwordClass, transform, params);
 	Sword->SettingbyType(this);
 
+	Shield = GetWorld()->SpawnActor<ACShield>(ShieldClass, transform, params);
 	StartLocation = GetActorLocation();
 
 	OnSword();
@@ -73,33 +96,91 @@ void ACEnemy_AI::Tick(float DeltaTime)
 	}
 }
 
+float ACEnemy_AI::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = ACharacter::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (!!Shield)
+	{
+		ACSword* sword = Cast<ACSword>(DamageCauser);
+		if (!!sword)
+		{
+			if (Shield->CheckAttackerSword(sword))
+			{
+				damage -= Shield->ShieldHealth();
+				if (damage <= 0.0f)
+					damage = 0.0f;
+			}
+
+		}
+	}
+
+	Health -= damage;
+	Health = FMath::Clamp<float>(Health, 0, MaxHealth);
+	UI_Enemy->UpdateHealth(Health, MaxHealth);
+
+	if (Health <= 0.0f)
+	{
+		Dead();
+
+		return 0.0f;
+	}
+
+
+	ACharacter* attacker = Cast<ACharacter>(EventInstigator->GetPawn());
+
+	Damaged((FDamagedDataEvent*)&DamageEvent, attacker);
+
+	return damage;
+}
+
 void ACEnemy_AI::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 {
 	ACAIController* controller = GetController<ACAIController>();
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Damaged);
-	ACEnemy_AI* attacker = Cast<ACEnemy_AI>(InAttacker);
+	ACEnemy_AI* ai_attacker = Cast<ACEnemy_AI>(InAttacker);
+	ACPlayer* player_attacker = Cast<ACPlayer>(InAttacker);
 
 	if (!!GroupManager && bFirstHitted == false)
 	{
 		bFirstHitted = true;
-		GroupManager->GoToLocation_AllEnemies(GetActorLocation());
+		
 		//Set Group Fighting
-		if (attacker && attacker->GetAiGroupManager() && !(GroupManager->GetFightingGroup()) && !(attacker->GetAiGroupManager()->GetFightingGroup()))
+		if (ai_attacker && ai_attacker->GetAiGroupManager() && !(GroupManager->GetFightingGroup()) && !(ai_attacker->GetAiGroupManager()->GetFightingGroup()))
 		{
-			attacker->SetFirstHitted(true);
-			attacker->GetAiGroupManager()->GoToLocation_AllEnemies(attacker->GetActorLocation());
+			GroupManager->GoToLocation_AllEnemies(GetActorLocation(), Group_State::GroupFighting);
 
-			SetCountEnemy(attacker);
-			attacker->SetCountEnemy(this);
+			ai_attacker->SetFirstHitted(true);
+			ai_attacker->GetAiGroupManager()->GoToLocation_AllEnemies(ai_attacker->GetActorLocation(), Group_State::GroupFighting);
+
+			SetCountEnemy(ai_attacker);
+			ai_attacker->SetCountEnemy(this);
 
 			bFinishGoToLocation = true;
-			attacker->SetFinishGoToLocation(true);
+			ai_attacker->SetFinishGoToLocation(true);
 
-			GroupManager->SetFightingGroup(attacker->GetAiGroupManager());
-			attacker->GetAiGroupManager()->SetFightingGroup(GroupManager);
+			GroupManager->SetFightingGroup(ai_attacker->GetAiGroupManager());
+			ai_attacker->GetAiGroupManager()->SetFightingGroup(GroupManager);
+
+			GroupManager->SetState(Group_State::GroupFighting);
+			ai_attacker->GetAiGroupManager()->SetState(Group_State::GroupFighting);
+		}
+
+		//Set Player Fighting
+		if (!!player_attacker)
+		{
+			GroupManager->GoToLocation_AllEnemies(GetActorLocation(), Group_State::PlayerFighting);
+
+			bPlayerAttacker = true;
+			SetPlayerTarget(player_attacker);
+
+			GroupManager->SetState(Group_State::PlayerFighting);
+			GroupManager->SetPlayerAttacker(player_attacker);
 		}
 	}
+
+	bShieldHitAnimation = Shield->CompleteShieldAnimation();
 
 	Super::Damaged(InEvent, InAttacker);
 }
@@ -110,8 +191,13 @@ void ACEnemy_AI::Dead()
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Wait);
 	bDead = true;
-	if(!!GroupManager)
+	if (!!GroupManager)
+	{
 		GroupManager->RemoveEnemy(this);
+		if (GroupManager->GetState() == Group_State::PlayerFighting)
+			GroupManager->SetPlayerAttacker();
+	}
+
 	Super::Dead();
 
 }
@@ -130,6 +216,7 @@ void ACEnemy_AI::End_Dead()
 	Super::End_Dead();
 
 	Destroy_Sword();
+	Destroy_Shield();
 }
 
 void ACEnemy_AI::OnSword()
@@ -239,9 +326,53 @@ void ACEnemy_AI::Destroy_Sword()
 	Sword = nullptr;
 }
 
+bool ACEnemy_AI::Do_shield()
+{
+	CheckNullResult(Shield, false);
+
+	return Shield->DoShield();
+}
+
+void ACEnemy_AI::Begin_shielded()
+{
+	CheckNull(Shield);
+
+	PlayAnimMontage(ShieldMontage, ShieldMontage_PlayRate);
+	Shield->Begin_shielded();
+}
+
+void ACEnemy_AI::End_shielded()
+{
+	CheckNull(Shield);
+
+	Shield->End_shielded();
+}
+
+void ACEnemy_AI::Destroy_Shield()
+{
+	CheckNull(Shield);
+
+	Shield->Destroy_Shield();
+	Shield = nullptr;
+}
+
 void ACEnemy_AI::Damaged_State()
 {
 	ACAIController* controller = GetController<ACAIController>();
 	UBlackboardComponent* blackboard = controller->GetBlackboardComponent();
 	blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Damaged);
+}
+
+void ACEnemy_AI::SetActionState()
+{
+	int32 RandomValue = FMath::RandRange(0, 99);
+
+	if (RandomValue < 70)
+	{
+		Action = Action_State::Attack;   
+	}
+	else
+	{
+		Action = Action_State::Shield;   
+	}
 }

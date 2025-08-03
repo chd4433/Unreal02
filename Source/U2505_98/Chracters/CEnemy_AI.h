@@ -3,14 +3,20 @@
 #include "CoreMinimal.h"
 #include "Chracters/CEnemy.h"
 #include "Weapons/ISword.h"
+#include "Weapons/IShield.h"
 #include "GenericTeamAgentInterface.h"
 #include "CEnemy_AI.generated.h"
 
+enum class Action_State : uint8
+{
+	Attack = 0, Shield, Max
+};
 
 UCLASS()
 class U2505_98_API ACEnemy_AI 
 	: public ACEnemy
 	, public IISword
+	, public IIShield
 	, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
@@ -25,6 +31,16 @@ private:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<class ACSword> SwordClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	TSubclassOf<class ACShield> ShieldClass;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	class UAnimMontage* ShieldMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montage")
+	float ShieldMontage_PlayRate = 1.0f;
 
 public:
 	FGenericTeamId GetGenericTeamId() const override;
@@ -46,6 +62,13 @@ public:
 	
 	FORCEINLINE const ACEnemy_AI* GetCountEnemy() { return CountEnemy; }
 	void SetCountEnemy(ACEnemy_AI* InEnemy);
+	void SetPlayerTarget(class ACPlayer* InPlayer);
+	void SetWanderTarget(class ACPlayer* InPlayer);
+
+	FORCEINLINE  void SetPlayerAttacker(bool InBool) { bPlayerAttacker = InBool; }
+	FORCEINLINE  const bool GetPlayerAttacker() { return bPlayerAttacker; }
+
+	FORCEINLINE  const bool GetbShieldHitAnimation() { return bShieldHitAnimation; }
 
 public:
 	void InitializeGroupFighting();
@@ -59,6 +82,8 @@ private:
 	void Tick(float DeltaTime) override;
 
 protected:
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 	void Damaged(struct FDamagedDataEvent* InEvent, class ACharacter* InAttacker) override;
 	void Dead() override;
 public:
@@ -89,9 +114,24 @@ public:
 	void Destroy_Sword() override;
 
 public:
+	bool Do_shield() override;
+	void Begin_shielded() override;
+	void End_shielded() override;
+
+	void Destroy_Shield() override;
+
+public:
 	void Damaged_State();
+
+public:
+	void SetActionState();
+	FORCEINLINE const Action_State GetActionState() { return Action; }
+
 private:
 	class ACSword* Sword;
+
+public:
+	class ACShield* Shield;
 
 private:
 	FVector StartLocation;
@@ -101,7 +141,14 @@ private:
 	ACEnemy_AI* CountEnemy;
 	bool bFinishGoToLocation;
 	bool bFirstHitted;
+	bool bPlayerAttacker;
 
 private:
 	bool bDead;
+
+private:
+	bool bShieldHitAnimation;
+
+private:
+	Action_State Action;
 };

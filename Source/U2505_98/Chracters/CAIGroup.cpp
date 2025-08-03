@@ -7,6 +7,7 @@
 #include "CAIStructures.h"
 #include "CEnemy.h"
 #include "CEnemy_AI.h"
+#include "CPlayer.h"
 
 ACAIGroup::ACAIGroup()
 {
@@ -84,7 +85,7 @@ void ACAIGroup::Tick(float DeltaTime)
 	}
 }
 
-void ACAIGroup::GoToLocation_AllEnemies(FVector Location)
+void ACAIGroup::GoToLocation_AllEnemies(FVector Location, Group_State InState)
 {
 	if (bFirstHitted == false)
 	{
@@ -92,6 +93,8 @@ void ACAIGroup::GoToLocation_AllEnemies(FVector Location)
 		{
 			if (enemy->GetFirstHitted())
 				continue;
+			enemy->GetAiGroupManager()->SetState(InState);
+
 			FVector2D rand = GetRandomPointMinMax(200, 500);
 			FVector randLocation = FVector(Location.X + rand.X, Location.Y + rand.Y, Location.Z);
 			//DrawDebugSphere(GetWorld(), randLocation, 25, 40, FColor::Green, false, 5.0f);
@@ -162,6 +165,35 @@ void ACAIGroup::RemoveEnemy(ACEnemy_AI* InEnemy)
 	CheckFalse(InEnemy->GetDead());
 
 	Enemies_AI.Remove(InEnemy);
+}
+
+void ACAIGroup::SetPlayerAttacker(ACPlayer* InPlayer)
+{
+	if (!!InPlayer)
+		FightingPlayer = InPlayer;
+
+	int attackerCount = 0;
+	for (ACEnemy_AI* enemy : Enemies_AI)
+		if (enemy->GetPlayerAttacker())
+			++attackerCount;
+
+	if (attackerCount < PlayerAttackerCount)
+	{
+		int count = PlayerAttackerCount - attackerCount;
+		for (ACEnemy_AI* enemy : Enemies_AI)
+		{
+			if (enemy->GetPlayerAttacker() == false && count != 0)
+			{
+				enemy->SetPlayerAttacker(true);
+				enemy->SetPlayerTarget(FightingPlayer);
+				count--;
+			}
+			else if(enemy->GetPlayerAttacker() == false)
+			{
+				enemy->SetWanderTarget(FightingPlayer);
+			}
+		}
+	}
 }
 
 #if WITH_EDITOR

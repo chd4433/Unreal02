@@ -20,7 +20,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Color")
 	FColor OriginColor = FColor::Black;
 
-private:
+protected:
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float MaxHealth = 100;
 
@@ -78,7 +78,7 @@ private:
 	void SetMaterialChange(USkeletalMeshComponent* meshComp);
 
 public:
-	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
 	virtual void Damaged(struct FDamagedDataEvent* InEvent, class ACharacter* InAttacker);
@@ -110,9 +110,9 @@ private:
 private:
 	TArray<class UMaterialInstanceDynamic*> Materials;
 
-private:
+protected:
 	float Health;
 
-private:
+protected:
 	class UCUserWidget_Enemy* UI_Enemy;
 };

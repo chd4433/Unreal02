@@ -21,6 +21,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FName AIStateKey = "AIState";
 
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FName WanderTargetKey = "WanderTarget";
+
 	UPROPERTY(EditAnywhere, Category = "Action")
 	float ActionDistance = 120.0f;
 

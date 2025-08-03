@@ -4,6 +4,11 @@
 #include "GameFramework/Actor.h"
 #include "CAIGroup.generated.h"
 
+enum class Group_State : uint8
+{
+	None = 0, GroupFighting, PlayerFighting, Max
+};
+
 UCLASS()
 class U2505_98_API ACAIGroup : public AActor
 {
@@ -19,6 +24,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float SpawnSpacing = 100.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	int PlayerAttackerCount = 2;
+
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bDebugSpawn = true;
 
@@ -28,6 +36,8 @@ public:
 
 	FORCEINLINE TArray<class ACEnemy_AI*> GetEnemiesArray() { return Enemies_AI; }
 
+	FORCEINLINE const Group_State GetState() { return State; }
+	FORCEINLINE void SetState(Group_State InState) { State = InState; }
 public:	
 	ACAIGroup();
 
@@ -38,7 +48,7 @@ private:
 	void Tick(float DeltaTime) override;
 
 public:
-	void GoToLocation_AllEnemies(FVector Location);
+	void GoToLocation_AllEnemies(FVector Location, Group_State InState);
 
 private:
 	FVector2D GetRandomPointMinMax(float MinRadius, float MaxRadius);
@@ -46,6 +56,9 @@ private:
 public:
 	void FindFightingEnemy();
 	void RemoveEnemy(class ACEnemy_AI* InEnemy);
+
+public:
+	void SetPlayerAttacker(class ACPlayer* InPlayer = nullptr);
 
 private:
 #if WITH_EDITOR
@@ -60,4 +73,8 @@ private:
 
 private:
 	ACAIGroup* FightingGroup;
+	class ACPlayer* FightingPlayer;
+
+private:
+	Group_State State = Group_State::None;
 };

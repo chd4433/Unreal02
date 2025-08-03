@@ -50,9 +50,21 @@ void UCBTTaskNode_GoToLocation::TickTask(UBehaviorTreeComponent& OwnerComp, uint
 	case EPathFollowingRequestResult::AlreadyAtGoal:
 		{
 			ACEnemy_AI* ai = Cast<ACEnemy_AI>(controller->GetPawn());
-			ai->SetFinishGoToLocation(true);
-			ai->GetAiGroupManager()->FindFightingEnemy();
-			blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Wait);
+			switch (ai->GetAiGroupManager()->GetState())
+			{
+			case Group_State::GroupFighting:
+				ai->SetFinishGoToLocation(true);
+				ai->GetAiGroupManager()->FindFightingEnemy();
+				blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Wait);
+				break;
+			case Group_State::PlayerFighting:
+				ai->SetFinishGoToLocation(true);
+				blackboard->SetValueAsEnum("AIState", (uint8)EAIStateType::Wander);
+			default:
+				break;
+			}
+
+			
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 			break;
 		}

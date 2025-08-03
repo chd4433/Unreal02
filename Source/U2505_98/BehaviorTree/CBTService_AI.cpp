@@ -6,6 +6,7 @@
 #include "Chracters/CEnemy_AI.h"
 #include "Chracters/CAIStructures.h"
 #include "Weapons/ISword.h"
+#include "Chracters/CAIGroup.h"
 
 UCBTService_AI::UCBTService_AI()
 {
@@ -32,26 +33,63 @@ void UCBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	IISword* sword = Cast<IISword>(ai);
 	CheckNull(sword);
 
-	ACharacter* groupTarget = Cast<ACharacter>(blackboard->GetValueAsObject(GroupTargetKey));
+	ACAIController* ai_Controller = Cast<ACAIController>(ai->GetController());
+	if (!!ai_Controller)
+		ai_Controller->ClearFocus(EAIFocusPriority::Gameplay);
+	
 
-	if (!!groupTarget)
+	if (!!(ai->GetAiGroupManager()))
 	{
-		float distance = ai->GetDistanceTo(groupTarget);
-		if (distance > ActionDistance)
+		ACharacter* groupTarget = Cast<ACharacter>(blackboard->GetValueAsObject(GroupTargetKey));
+
+		if (!!groupTarget)
 		{
-			if (sword->IsAttacking() == false)
+			float distance = ai->GetDistanceTo(groupTarget);
+			if (distance > ActionDistance)
 			{
-				blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::GroupTargetApproach);
+				if (sword->IsAttacking() == false)
+				{
+					blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::GroupTargetApproach);
+				}
+
+				return;
+			}
+			else
+			{
+				switch (ai->GetActionState())
+				{
+				case Action_State::Attack:
+					if (sword->IsAttacking() == false)
+						blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Attack);
+					return;
+				case Action_State::Shield:
+					blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Shield);
+					return;
+				}
+			}
+		}
+
+		switch (ai->GetAiGroupManager()->GetState())
+		{
+		case Group_State::PlayerFighting:
+		{
+			ACharacter* wanderTarget = Cast<ACharacter>(blackboard->GetValueAsObject(WanderTargetKey));
+			if (!!wanderTarget)
+			{
+				ACAIController* aiController = Cast<ACAIController>(ai->GetController());
+				if(!!aiController)
+					aiController->SetFocus(wanderTarget);
 			}
 
-			return;
+			blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Wander);
 		}
-		else
-		{
-			if (sword->IsAttacking() == false)
-				blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Attack);
 
 			return;
+		case Group_State::GroupFighting:
+			blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Partrol);
+			return;
+		default:
+			break;
 		}
 	}
 
@@ -82,9 +120,15 @@ void UCBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	}
 	else
 	{
-		if (sword->IsAttacking() == false)
-			blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Attack);
-		
-		return;
+		switch (ai->GetActionState())
+		{
+		case Action_State::Attack:
+			if (sword->IsAttacking() == false)
+				blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Attack);
+			return;
+		case Action_State::Shield:
+			blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Shield);
+			return;
+		}
 	}
 }

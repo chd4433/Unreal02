@@ -12,7 +12,9 @@
 #include "CAnimInstance.h"
 #include "CEnemy_AI.h"
 #include "Weapons/CWeaponStructures.h"
+#include "Weapons/CShield.h"
 #include "Widgets/CUserWidget_Enemy.h"
+
 
 
 ACEnemy::ACEnemy()
@@ -189,7 +191,17 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 
 	FDamagedData* data = InEvent->DamagedData;
 
-	data->PlayHitMotion(this);
+	ACEnemy_AI* enemy_ai = Cast<ACEnemy_AI>(this);
+
+	if (!!enemy_ai)
+	{
+		if (enemy_ai->GetbShieldHitAnimation())
+			enemy_ai->Shield->PlayShieldHittedAnimation();
+		else
+			data->PlayHitMotion(this);
+	}
+	else
+		data->PlayHitMotion(this);
 
 
 	FVector start = GetActorLocation();
@@ -214,7 +226,6 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 		else
 			LaunchCharacter(launchDistance, false, false);
 
-		FLog::Log(launchDistance);
 
 	}
 	
@@ -223,8 +234,6 @@ void ACEnemy::Damaged(FDamagedDataEvent* InEvent, ACharacter* InAttacker)
 	LookAtRot.Roll = 0.f;
 
 	SetActorRotation(LookAtRot);
-
-	//SetActorRotation(UKismetMathLibrary::FindLookAtRotation(start, target));
 
 
 	if (InEvent->bFirstHit)
