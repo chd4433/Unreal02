@@ -30,12 +30,6 @@ private:
 	class UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere)
-	class USpringArmComponent* ExecutionSpringArm;
-
-	UPROPERTY(VisibleAnywhere)
-	class UCameraComponent* ExecutionCamera;
-
-	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* Sworldsheath;
 
 	UPROPERTY(VisibleAnywhere)
@@ -125,6 +119,9 @@ private:
 public:
 	void EndExecution();
 
+private:
+	void ChangeCamera(uint32 InCameraIndex, bool InChange = false,FVector InPosition = FVector::ZeroVector, FRotator InRotator = FRotator::ZeroRotator);
+
 public:
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -152,6 +149,8 @@ public:
 	bool IsEquipping() override;
 	bool IsAttacking()override;
 	bool IsAttached_Hand()override;
+	bool IsComboAttack()override;
+	void SetComboAttack(bool Inbool) override;
 
 	void Begin_Equip() override;
 	void End_Equip() override;
@@ -190,4 +189,10 @@ private:
 
 private:
 	class ACEnemy* ExecutionEnemy;
+
+
+
+private:
+	TArray<AActor*> CameraActors;
+	uint32 CameraIndex = 0;
 };

@@ -65,6 +65,9 @@ void UCBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 				case Action_State::Shield:
 					blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Shield);
 					return;
+				case Action_State::ComboAttack:
+					blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::ComboAttack);
+					return;
 				}
 			}
 		}
@@ -128,6 +131,8 @@ void UCBTService_AI::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 			return;
 		case Action_State::Shield:
 			blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::Shield);
+		case Action_State::ComboAttack:
+			blackboard->SetValueAsEnum(AIStateKey, (uint8)EAIStateType::ComboAttack);
 			return;
 		}
 	}

@@ -96,6 +96,9 @@ public:
 	void ExecutionDefender();
 
 public:
+	void OffUI();
+
+public:
 	FORCEINLINE const float GetHealth() {return Health;}
 
 	FORCEINLINE bool Air_Reaction() override { return bAirReaction; };

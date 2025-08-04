@@ -289,6 +289,13 @@ void ACEnemy::ExecutionDefender()
 	PlayAnimMontage(ExecutionDenfenderMontage, ExecutionDenfenderMontage_PlayRate);
 }
 
+void ACEnemy::OffUI()
+{
+	CheckNull(UI_Enemy);
+
+	UI_Enemy->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void ACEnemy::SetChangeCollision(ECollisionType InType)
 {
 	switch (InType)

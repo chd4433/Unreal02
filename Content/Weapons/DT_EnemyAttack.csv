@@ -1,0 +1,6 @@
+,Type,Montage,PlayRate,bCanMove,bFixedCamera
+1,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Sword_Attack_1_Montage.Sword_Attack_1_Montage',2,FALSE,FALSE
+2,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack1_Second_Seq_Montage.Attack1_Second_Seq_Montage',2,FALSE,FALSE
+3,Attack,/Script/Engine.AnimMontage'/Game/Montages/Sword/Attack1_third_Seq_Montage.Attack1_third_Seq_Montage',2,FALSE,FALSE
+4,Equip,/Script/Engine.AnimMontage'/Game/Montages/Sword/Equip_Sword_Montage.Equip_Sword_Montage',1,TRUE,FALSE
+5,Unequip,/Script/Engine.AnimMontage'/Game/Montages/Sword/Equip_Sword_Montage.Equip_Sword_Montage',1,TRUE,FALSE

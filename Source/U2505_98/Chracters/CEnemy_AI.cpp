@@ -255,6 +255,21 @@ bool ACEnemy_AI::IsAttached_Hand()
 	return Sword->IsAttached_Hand();
 }
 
+bool ACEnemy_AI::IsComboAttack()
+{
+	CheckNullResult(Sword, false);
+
+	return Sword->IsComboAttack();
+}
+
+void ACEnemy_AI::SetComboAttack(bool Inbool)
+{
+	CheckNull(Sword);
+
+	Sword->SetComboAttack(Inbool);
+}
+
+
 void ACEnemy_AI::Begin_Equip()
 {
 	CheckNull(Sword);
@@ -367,9 +382,13 @@ void ACEnemy_AI::SetActionState()
 {
 	int32 RandomValue = FMath::RandRange(0, 99);
 
-	if (RandomValue < 70)
+	if (RandomValue < 40)
 	{
 		Action = Action_State::Attack;   
+	}
+	else if (RandomValue < 70)
+	{
+		Action = Action_State::ComboAttack;
 	}
 	else
 	{

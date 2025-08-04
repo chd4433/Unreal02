@@ -26,6 +26,8 @@ public:
 	virtual bool IsEquipping() = 0;
 	virtual bool IsAttacking() = 0;
 	virtual bool IsAttached_Hand() = 0;
+	virtual bool IsComboAttack() = 0;
+	virtual void SetComboAttack(bool Inbool) = 0;
 
 	virtual void Begin_Equip() = 0;
 	virtual void End_Equip() = 0;

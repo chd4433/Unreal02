@@ -46,6 +46,8 @@ public:
 	FORCEINLINE bool IsEquipped() { return bEquipped; }
 	FORCEINLINE bool IsEquipping() { return bEquipping; }
 	FORCEINLINE bool IsAttacking() { return bAttacking; }
+	FORCEINLINE bool IsComboAttack() { return bEnterComboAttack; }
+	FORCEINLINE void SetComboAttack(bool Inbool) { bEnterComboAttack = Inbool; }
 
 public:
 	void SettingbyType(ACharacter* InCharacter);
@@ -106,6 +108,8 @@ private:
 
 	bool bAttacking;
 	int32 Index;
+
+	bool bEnterComboAttack;
 
 
 private:

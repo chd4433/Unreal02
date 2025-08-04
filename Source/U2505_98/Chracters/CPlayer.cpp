@@ -24,9 +24,6 @@ ACPlayer::ACPlayer()
 	FHelpers::CreateComponent<UStaticMeshComponent>(this, &Sworldsheath, "Sworldsheath", GetMesh(), "Back_Swordsheath");
 	//FHelpers::CreateComponent<UMotionWarpingComponent>(this, &MotionWarping, "MotionWarping");
 
-	FHelpers::CreateComponent<USpringArmComponent>(this, &ExecutionSpringArm, "ExecutionSpringArm", GetCapsuleComponent());
-
-	FHelpers::CreateComponent<UCameraComponent>(this, &ExecutionCamera, "ExecutionCamera", ExecutionSpringArm);
 
 	MotionWarping = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 
@@ -48,26 +45,6 @@ ACPlayer::ACPlayer()
 	SpringArm->TargetArmLength = 200;
 	SpringArm->bUsePawnControlRotation = true;
 	SpringArm->bEnableCameraLag = true;
-
-	ExecutionSpringArm->SetRelativeLocation(FVector(0.f, 0.f, 60.f)); 
-	ExecutionSpringArm->SetRelativeRotation(FRotator(0.f, -40.f, 0.f)); 
-	ExecutionSpringArm->TargetArmLength = 100.f; 
-	ExecutionSpringArm->bUsePawnControlRotation = false; 
-	ExecutionSpringArm->bEnableCameraLag = true;
-	ExecutionSpringArm->CameraLagSpeed = 5.0f; 
-
-	ExecutionCamera->SetRelativeLocation(FVector(0.f, 170.f, 00.f));
-	ExecutionCamera->SetRelativeRotation(FRotator(0.f, -40.f, 0.f));
-	ExecutionCamera->bAutoActivate = false;
-
-
-	//ExecutionSpringArm->SetRelativeLocation(FVector(0, 0, 60));
-	//ExecutionSpringArm->SetRelativeRotation(FRotator(0, 0, -40.0f));
-	//ExecutionSpringArm->TargetArmLength = 200;
-	//ExecutionSpringArm->bUsePawnControlRotation = true;
-	//ExecutionSpringArm->bEnableCameraLag = true;
-
-	//ExecutionCamera->bAutoActivate = false;
 
 
 	FHelpers::GetClass<ACSword>(&SwordClass, "/Script/Engine.Blueprint'/Game/Weapons/BP_CSword.BP_CSword_C'");
@@ -105,6 +82,22 @@ void ACPlayer::BeginPlay()
 	UI_Player = CreateWidget<UCUserWidget_Player>(GetController<APlayerController>(), UI_PlayerClass);
 	UI_Player->AddToViewport();
 	UI_Player->UpdateEquipped(IsEquipped());
+
+	CameraActors.Add(this);
+
+	for (AActor* actor : GetWorld()->GetCurrentLevel()->Actors)
+	{
+		if (actor == nullptr)
+			continue;
+
+		UCameraComponent* camera = actor->GetComponentByClass<UCameraComponent>();
+
+		if (!!camera && actor != this)
+		{
+			CameraActors.Add(actor);
+
+		}
+	}
 
 }
 
@@ -276,6 +269,8 @@ void ACPlayer::Execution()
 
 	FVector EnemyLocation = ExecutionEnemy->GetActorLocation();
 	FVector EnemyForward = ExecutionEnemy->GetActorForwardVector();
+	FVector PlayerRight = GetActorRightVector();
+
 
 	FVector TargetLocation = EnemyLocation + EnemyForward * 50.0f;
 	FRotator TargetRotation = (EnemyLocation - TargetLocation).Rotation();
@@ -297,8 +292,15 @@ void ACPlayer::Execution()
 	}
 	ExecutionEnemy->ExecutionDefender();
 
-	ExecutionCamera->SetActive(true);
-	Camera->SetActive(false);
+	FVector CameraOffset = PlayerRight * 200.0f + FVector::UpVector * 100.0f;
+	FVector CameraPosition = TargetLocation + CameraOffset;
+
+	FRotator CameraRotation = UKismetMathLibrary::FindLookAtRotation(CameraPosition, TargetLocation);
+
+	ChangeCamera(1, true, CameraPosition, CameraRotation);
+
+	ExecutionEnemy->OffUI();
+
 
 	bFixedCamera = true;
 
@@ -306,9 +308,26 @@ void ACPlayer::Execution()
 
 void ACPlayer::EndExecution()
 {
-	ExecutionCamera->SetActive(false);
-	Camera->SetActive(true);
+	ChangeCamera(0);
 	bFixedCamera = false;
+}
+
+void ACPlayer::ChangeCamera(uint32 InCameraIndex, bool InChange , FVector InPosition, FRotator InRotator)
+{
+	CheckTrue(CameraIndex == InCameraIndex);
+	CameraIndex = InCameraIndex;
+
+	AActor* actor = CameraActors[CameraIndex];
+
+
+	if (InChange == true)
+	{
+		actor->SetActorLocation(InPosition);
+		actor->SetActorRotation(InRotator);
+	}
+	
+	//float time = FMath::RandRange(1.0f, 3.0f);
+	GetController<APlayerController>()->SetViewTargetWithBlend(actor, 1.0f, EViewTargetBlendFunction::VTBlend_EaseInOut, 2.0f);
 }
 
 float ACPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -448,6 +467,21 @@ bool ACPlayer::IsAttached_Hand()
 	return Sword->IsAttached_Hand();
 }
 
+bool ACPlayer::IsComboAttack()
+{
+	CheckNullResult(Sword, false);
+
+	return Sword->IsComboAttack();
+}
+
+void ACPlayer::SetComboAttack(bool Inbool)
+{
+	CheckNull(Sword);
+	Sword->SetComboAttack(Inbool);
+}
+
+
+
 void ACPlayer::Begin_Equip()
 {
 	CheckNull(Sword);
@@ -470,7 +504,7 @@ void ACPlayer::OnDoAction()
 	else
 	{
 		LineTrace();
-		if (!!ExecutionEnemy)
+		if (!!ExecutionEnemy && bAttackJump == false)
 		{
 			Execution();
 			ExecutionEnemy = nullptr;

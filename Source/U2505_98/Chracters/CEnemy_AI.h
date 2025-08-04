@@ -9,7 +9,7 @@
 
 enum class Action_State : uint8
 {
-	Attack = 0, Shield, Max
+	Attack = 0, Shield, ComboAttack, Max
 };
 
 UCLASS()
@@ -97,6 +97,8 @@ public:
 	bool IsEquipping()override;
 	bool IsAttacking() override;
 	bool IsAttached_Hand() override;
+	bool IsComboAttack()override;
+	void SetComboAttack(bool Inbool) override;
 
 	void Begin_Equip()override;
 	void End_Equip() override;

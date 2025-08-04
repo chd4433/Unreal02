@@ -8,7 +8,7 @@
 UENUM(BlueprintType)
 enum class EAIStateType : uint8
 {
-	Wait = 0, Partrol, Equip, Approach,GroupTargetApproach, Attack, Shield, Damaged, GoToLocation,Wander, Max,
+	Wait = 0, Partrol, Equip, Approach,GroupTargetApproach, Attack, Shield, ComboAttack, Damaged, GoToLocation,Wander, Max,
 };
 
 UCLASS()

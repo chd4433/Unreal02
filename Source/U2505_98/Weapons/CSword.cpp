@@ -35,7 +35,6 @@ ACSword::ACSword()
 
 	FHelpers::GetAsset<UDataTable>(&WeaponDataTable, "/Script/Engine.DataTable'/Game/Weapons/DT_PlayerAttack.DT_PlayerAttack'");
 
-	//FHelpers::GetAsset<UDataTable>(&DamagedDataTable, "/Script/Engine.DataTable'/Game/Weapons/DT_DamagedData.DT_DamagedData'");
 	FHelpers::GetAsset<UDataTable>(&DamagedDataTable, "/Script/Engine.DataTable'/Game/Weapons/DT_DamagedData.DT_DamagedData'");
 
 }
@@ -68,6 +67,10 @@ void ACSword::SettingbyType(ACharacter* InCharacter)
 		Capsule->SetRelativeRotation(FRotator(180.0f, 0.0f, 180.0f));
 		Capsule->SetCapsuleHalfHeight(50.f);
 		Capsule->SetCapsuleRadius(7.f);
+
+		FHelpers::GetAssetDynamic<UDataTable>(&WeaponDataTable, "/Script/Engine.DataTable'/Game/Weapons/DT_EnemyAttack.DT_EnemyAttack'");
+
+		FHelpers::GetAssetDynamic<UDataTable>(&DamagedDataTable, "/Script/Engine.DataTable'/Game/Weapons/DT_EnemyDamagedData.DT_EnemyDamagedData'");
 
 		return;
 	}
@@ -190,6 +193,7 @@ void ACSword::Begin_DoAction()
 	CheckFalse(bExist);
 	bExist = false;
 	++Index;
+	bEnterComboAttack = true;
 	if (Index > static_cast<uint8>(ESwordAttackType::UpperAttack))
 	{
 		ACPlayer* player = Cast<ACPlayer>(OwnerCharacter);
@@ -198,6 +202,7 @@ void ACSword::Begin_DoAction()
 	}
 
 	ActionDatas[Index].PlayMontage(OwnerCharacter);
+
 }
 
 void ACSword::End_DoAction()
